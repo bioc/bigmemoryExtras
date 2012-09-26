@@ -2,8 +2,9 @@
 \alias{.initBigMatrix}
 \title{Create a new BigMatrix-derived class}
 \usage{
-  .initBigMatrix(x = NULL, class, backingfile, nrow, ncol,
-    dimnames, type = "double", ...)
+  .initBigMatrix(x = NULL,
+    class = c("BigMatrix", "BigMatrixFactor"), backingfile,
+    nrow, ncol, dimnames, type = "double", ...)
 }
 \arguments{
   \item{x}{NULL, matrix, or big.matrix. Optional data or

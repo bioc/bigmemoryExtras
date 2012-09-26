@@ -269,8 +269,8 @@ setAs("BigMatrix","matrix", function(from) { return(from[,]) })
 ##' @return BigMatrix
 ##' @keywords internal
 ##' @rdname initBigMatrix
-.initBigMatrix = function(x=NULL, class, backingfile, nrow, ncol, dimnames, type="double", ...) {
-  if (! class %in% c("BigMatrix","BigMatrixFactor")) { stop("BigMatrix derived class ", class, " not supported.") }
+.initBigMatrix = function(x=NULL, class=c("BigMatrix","BigMatrixFactor"), backingfile, nrow, ncol, dimnames, type="double", ...) {
+  class = match.arg(class)
   backingpath = dirname(backingfile)
   dir.create(backingpath,showWarnings=FALSE,recursive=TRUE)
   backingpath = normalizePath(backingpath)
@@ -341,7 +341,7 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                    return(mat)
                                  },
                                  setValues=function(i,j,value) {
-                                   if (class(value) == "character") {
+                                   if (is.character(value)) {
                                      value = match(value,.self$levels)
                                    }
                                    callSuper(i,j,value)

@@ -32,5 +32,5 @@ biocViews: Infrastructure, DataRepresentation
 Collate:
     'BigMatrix.R'
     'eset.R'
-    'test_BigMatrix_package.R'
     'zzz.R'
+    'test_bigmemoryExtras_package.R'
