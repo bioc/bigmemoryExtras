@@ -123,8 +123,8 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              if ( ! file.exists(backingfile) ) {
                                stop("Backing file ",backingfile," does not exist.")
                              }
-                             if ( file.access( backingfile, 2 ) != 0 || file.access( backingfile, 4 ) != 0 ) {
-                               stop("Can not attach to backing file without both read and write permissions due to the current implementation of the big.matrix class in bigmemory.")
+                             if ( file.access( backingfile, 4 ) != 0 ) {
+                               stop("Can not attach to backing file without read permissions on the backing file.")
                              }
                              tryCatch({
                                .self$.bm = attach.big.matrix(desc,path=dirname(.self$descpath))
@@ -150,24 +150,21 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              }
                            },
                            setValues=function(i,j,value) {
-                             if ( file.access(.self$descpath,2) < 0 ) {
-                               stop("You do not have write permission on the 'desc' file for this BigMatrix class object (description file).")
-                             } else {
-                               object = .self$bigmat
-                               if (!missing(i) && is.character(i)) { i = match(i,base::rownames(object)) }
-                               if (!missing(j) && is.character(j)) { j = match(j,base::colnames(object)) }
-                               if (missing(i)) {
-                                 if (missing(j)) {
-                                   object[,] <- value
-                                 } else {
-                                   object[,j] <- value
-                                 }
+                             object = .self$bigmat
+                             bigmemory:::checkReadOnly(object)
+                             if (!missing(i) && is.character(i)) { i = match(i,base::rownames(object)) }
+                             if (!missing(j) && is.character(j)) { j = match(j,base::colnames(object)) }
+                             if (missing(i)) {
+                               if (missing(j)) {
+                                 object[,] <- value
                                } else {
-                                 if (missing(j)) {
-                                   object[i,] <- value
-                                 } else {
-                                   object[i,j] <- value
+                                 object[,j] <- value
                                  }
+                             } else {
+                               if (missing(j)) {
+                                 object[i,] <- value
+                               } else {
+                                 object[i,j] <- value
                                }
                              }
                            },

@@ -37,11 +37,6 @@ as necessary. This avoids a segfault caused by accessing what could otherwise
 be a nil pointer. For example, A nil pointer occurs when a big.matrix data is saved and loaded 
 using \code{save()} and \code{load()}.
 
-BigMatrix objects check the filesytem write permissions on the metadata
-file (the *.rds file) before modifying data in order to prevent undesired modification of
-any of the on-disk data. This feature will eventually be replaced with
-read-only or read/write access which is in development in the bigmemory pacakge.
-
 Reference classes are a relatively new and unused feature of R. They
 represent a new object model that is quite similar to OOP you might have
 seen in java or python. The ?ReferenceClasses help page is an excellent

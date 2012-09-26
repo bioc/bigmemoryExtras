@@ -33,9 +33,7 @@
 \section{Introduction}
 This package defines a "BigMatrix" ReferenceClass which adds safety and convenience features to the filebacked.big.matrix class from the
 bigmemory package. BigMatrix protects against segfaults by monitoring
-and gracefully restoring the connection to on-disk data and it also
-protects against accidental data modification with a filesystem-based
-permissions system. We provide utilities for using BigMatrix-derived
+and gracefully restoring the connection to on-disk data. We provide utilities for using BigMatrix-derived
 classes as assayData matrices within the Biobase package's eSet family
 of classes. BigMatrix provides some optimizations related to attaching
 to, and indexing into, file-backed matrices with
@@ -83,24 +81,6 @@ while. BigMatrix uses readRDS and saveRDS to store meta-data in a
 third file, which requires about 1/10 the time to read when it's time
 to attach an object to the backingfile. Use of a separate file allows access to the
 on-disk data via big.matrix or BigMatrix objects.
-
-\section{Limiting Write Permissions}
-BigMatrix provides OS-level write permissions to the on-disk
-data. With both big.matrix and BigMatrix, a user must always have read
-and write permissions to the backingfile. BigMatrix uses the file system permissions on the meta-data
-file, checking for write permission before allowing the user to alter
-any of the on-disk data. This allows for a measure of safety when
-BigMatrix data are used as a group resource.
-
-<<writepermissions>>=
-ds[1,1] = 5
-Sys.chmod(ds$descpath,"0444")
-tryCatch( { ds[1,1] = 10 }, error = function(e) { print(e) } )
-Sys.chmod(ds$descpath,"0644")
-ds[1,1] = 10
-ds[,]
-as(ds,"matrix")
-@ 
 
 \section{S4 Style Access}
 The BigMatrix class uses R's Reference Class system. Any change to the

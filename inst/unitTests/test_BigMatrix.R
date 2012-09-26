@@ -71,9 +71,11 @@ test_write <- function() {
   checkIdentical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix")
   ds[,] = mat
   checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix")
-  Sys.chmod(ds$descpath,"0444")
-  checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable description file")
-  Sys.chmod(ds$descpath,"0644")
+  Sys.chmod(ds$datapath,"0444")
+  ds$attach()
+  checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
+  Sys.chmod(ds$datapath,"0644")
+  ds$attach()
   fs[,] = int.mat
   fs[,1] = 1:3
   returned.factor = factor(structure(c("AA","BB",NA),names=letters[1:3]),levels=levels)
@@ -81,7 +83,6 @@ test_write <- function() {
   fs[,1] = c("BB",NA,"AA")
   returned.factor = factor(structure(c("BB",NA,"AA"),names=letters[1:3]),levels=levels)
   checkIdentical(fs[,1], returned.factor, "Setting BigMatrixFactor with characters")
-  return(TRUE)
 }
 
 test_describing <- function() {
