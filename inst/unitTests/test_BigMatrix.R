@@ -113,11 +113,6 @@ test_reattach <- function() {
     Sys.chmod(old.ds$descpath,"0644")
   }
   
-  Sys.chmod(data.file,"0400")
-  checkException(old.ds$attach(),silent=TRUE)
-  Sys.chmod(data.file,"0600")
-  checkEquals( old.ds[,], mat )
-
   file.rename(data.file,file.path(tempdir(),"shoe"))
   Sys.chmod(old.ds$descpath,"0600")
   if (Sys.info()[["sysname"]] != "Windows") {
