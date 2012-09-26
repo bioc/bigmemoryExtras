@@ -1,6 +1,7 @@
 Package: bigmemoryExtras
 Type: Package
-Title: An extension of the bigmemory package with added safety, convenience, and a factor class.
+Title: An extension of the bigmemory package with added safety, convenience,
+    and a factor class.
 Version: 0.99.3
 Author: Peter M. Haverty
 Maintainer: Peter M. Haverty <phaverty@gene.com>
@@ -20,7 +21,7 @@ LazyLoad: yes
 ByteCompile: TRUE
 Depends:
     R (>= 2.12),
-    bigmemory (>=4.3)
+    bigmemory (>= 4.3)
 Imports:
     bigmemory,
     methods,
