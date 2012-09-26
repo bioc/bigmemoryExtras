@@ -1,6 +1,6 @@
 \docType{package}
-\name{BigMatrix-package}
-\alias{BigMatrix-package}
+\name{bigmemoryExtras-package}
+\alias{bigmemoryExtras-package}
 \title{An extension of the bigmemory package with added safety, convenience, and a factor class.}
 \description{
   This package defines a "BigMatrix" ReferenceClass which

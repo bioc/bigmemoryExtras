@@ -20,8 +20,8 @@
 ##' "nil" pointer is attempted.
 ##'
 ##' @docType package
-##' @name BigMatrix-package
-##' @aliases BigMatrix-package
+##' @name bigmemoryExtras-package
+##' @aliases bigmemoryExtras-package
 ##' @seealso BigMatrix-class BigMatrixFactor-class BigMatrix BigMatrixFactor filebacked.big.matrix ReferenceClasses
 ##' @import methods
 ##' @import bigmemory

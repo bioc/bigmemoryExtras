@@ -1,8 +1,8 @@
 Package: bigmemoryExtras
 Type: Package
 Title: An extension of the bigmemory package with added safety,
-        convenience, and a factor class.
-Version: 0.99.0
+    convenience, and a factor class.
+Version: 0.99.1
 Author: Peter M. Haverty
 Maintainer: Peter M. Haverty <phaverty@gene.com>
 Description: This package defines a "BigMatrix" ReferenceClass which adds
@@ -19,8 +19,18 @@ Description: This package defines a "BigMatrix" ReferenceClass which adds
 License: Artistic-2.0
 LazyLoad: yes
 ByteCompile: TRUE
-Depends: R (>= 2.12)
-Imports: bigmemory, methods, Biobase
-Suggests: RUnit, BiocGenerics (>= 0.1.0)
+Depends:
+    R (>= 2.12)
+Imports:
+    bigmemory,
+    methods,
+    Biobase
+Suggests:
+    RUnit,
+    BiocGenerics (>= 0.1.0)
 biocViews: Infrastructure, DataRepresentation
-Collate: 'BigMatrix.R' 'eset.R' 'test_BigMatrix_package.R' 'zzz.R'
+Collate:
+    'BigMatrix.R'
+    'eset.R'
+    'test_BigMatrix_package.R'
+    'zzz.R'

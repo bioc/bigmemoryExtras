@@ -1,1 +1,1 @@
-.test <- function() BiocGenerics:::testPackage("BigMatrix")
+.test <- function() BiocGenerics:::testPackage("bigmemoryExtras")

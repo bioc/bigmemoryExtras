@@ -1,6 +1,6 @@
-%\VignetteIndexEntry{BigMatrix}
+%\VignetteIndexEntry{bigmemoryExtras}
 %\VignetteDepends{}
-%\VignetteKeywords{BigMatrix}
+%\VignetteKeywords{bigmemoryExtras}
 \documentclass[10pt]{article}
 
 \usepackage{times}
@@ -18,7 +18,7 @@
 \evensidemargin=-.1in
 \headheight=-.3in
 
-\title{An Introduction to the BigMatrix Package}
+\title{An Introduction to the bigmemoryExtras Package}
 \author{Peter M. Haverty}
 \date{\today}
 
@@ -43,7 +43,7 @@ dimnames. Additionally, the package provides a "BigMatrixFactor"
 class, a file-backed matrix with factor properties.
 
 <<introcode>>=
-library(BigMatrix)
+library(bigmemoryExtras)
 data.file = file.path(tempdir(),"bigmat","ds")
 x = matrix(1:9,ncol=3,dimnames=list(letters[1:3],LETTERS[1:3]))
 ds = BigMatrix(x,data.file)
@@ -56,7 +56,7 @@ When a big.matrix object is attached to it's on-disk data, an external
 pointer is used to connect the R object to a C++ data structure. When
 a big.matrix object is not attached, like when it is loaded from an RData
 file, this pointer is nil. Any access to this nil pointer will crash
-R. The BigMatrix package provides a BigMatrix class that prevents such
+R. The bigmemoryExtras package provides a BigMatrix class that prevents such
 a crash by
 controlling access to the external pointer. Additionally, BigMatrix
 objects remember the location of their on-disk components and
@@ -125,7 +125,7 @@ ds$length()
 @ 
 
 \section{BigMatrixFactor}
-The BigMatrix package adds a ``BigMatrixFactor'' class to provide a
+The bigmemoryExtras package adds a ``BigMatrixFactor'' class to provide a
 means to store large matrices of characters. On the file system, these
 are stored as the C type char or int (8 or 32 bits), depending on the number of
 levels in the factor. Subsetting a BigMatrixFactor returns a base
