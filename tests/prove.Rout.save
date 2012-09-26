@@ -1,0 +1,73 @@
+
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> require("BigMatrix") || stop("unable to load BigMatrix package")
+Loading required package: BigMatrix
+
+bigmemory >= 4.0 is a major revision since 3.1.2; please see package
+biganalytics and http://www.bigmemory.org for more information.
+
+[1] TRUE
+> BigMatrix:::.test()
+Attaching to on-disk data: /tmp/RtmpwTXGpU/file508557463e5e.desc.rds ...
+Note: no visible binding for global variable 'description' 
+Attaching to on-disk data: /tmp/RtmpwTXGpU/file50854899071f.desc.rds ...
+Attaching to on-disk data: /tmp/RtmpwTXGpU/file50854899071f.desc.rds ...
+Attaching to on-disk data: /tmp/RtmpwTXGpU/file50854899071f.desc.rds ...
+Attaching to on-disk data: /tmp/RtmpwTXGpU/file50854899071f.desc.rds ...
+Attaching to on-disk data: /tmp/RtmpwTXGpU/file50854899071f.desc.rds ...
+Loading required package: Biobase
+Loading required package: BiocGenerics
+
+Attaching package: 'BiocGenerics'
+
+The following object(s) are masked from 'package:stats':
+
+    xtabs
+
+The following object(s) are masked from 'package:base':
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, cbind,
+    colnames, duplicated, eval, get, intersect, lapply, mapply, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, rbind, rep.int,
+    rownames, sapply, setdiff, table, tapply, union, unique
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+
+RUNIT TEST PROTOCOL -- Mon Sep 10 15:44:56 2012 
+*********************************************** 
+Number of test functions: 10 
+Number of errors: 0 
+Number of failures: 0 
+
+ 
+1 Test Suite : 
+BigMatrix RUnit Tests - 10 test functions, 0 errors, 0 failures
+Number of test functions: 10 
+Number of errors: 0 
+Number of failures: 0 
+> 
+> proc.time()
+   user  system elapsed 
+  2.100   0.088   2.506 

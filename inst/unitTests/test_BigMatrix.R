@@ -1,0 +1,153 @@
+rownames = letters[1:3]
+colnames = LETTERS[1:3]
+mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
+int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
+levels = c("AA","BB")
+char.mat = matrix()
+  
+back.dir = tempdir()
+ds.data.file = file.path(back.dir,"bigmat","ds")
+ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+ds.data.file = normalizePath(ds.data.file)
+fs.data.file = file.path(back.dir,"bigmat","fs")
+fs = BigMatrixFactor(int.mat,fs.data.file,3,3,list(rownames,colnames),levels=levels)
+
+test_creation <- function() {
+  back.dir = tempdir()
+  
+  ds = BigMatrix(mat,tempfile())
+  fs = BigMatrixFactor(int.mat,tempfile(),levels=levels)
+  checkTrue(validObject(ds))
+  checkTrue(validObject(fs))
+  checkEquals(ds[,],mat)
+  checkEquals(as(fs[,],"matrix"),int.mat)
+  
+  ds = BigMatrix(ds$bigmat,tempfile())
+  fs = BigMatrixFactor(fs$bigmat,tempfile(),levels=levels)
+  checkTrue(validObject(ds))
+  checkTrue(validObject(fs))
+  checkEquals(ds[,],mat)
+  checkEquals(as(fs[,],"matrix"),int.mat)
+
+  ds = BigMatrix(x=NULL,tempfile(),3,3,list(rownames,colnames))
+  ds[,] = mat
+  fs = BigMatrixFactor(x=NULL,tempfile(),3,3,list(rownames,colnames),levels=levels)
+  fs[,] = int.mat
+  checkTrue(validObject( ds ))
+  checkEquals(ds[,],mat)
+  checkTrue(validObject( fs ))
+  checkEquals(as(fs[,],"matrix"),int.mat)
+}
+
+test_coercion <- function() {
+  checkEquals( ds[,], as(ds,"matrix") )
+  checkEquals( as(fs[,],"matrix"), as(fs,"matrix") )
+  checkEquals( fs[,], as(fs,"factor") )
+}
+
+test_subset <- function() {
+  checkIdentical( ds[1,3], mat[1,3] )
+  checkIdentical( ds[1,], mat[1,] )
+  checkIdentical( ds[,2], mat[,2] )
+  checkIdentical( ds[,], mat )
+  checkIdentical( ds["a",], mat["a",] )
+  checkIdentical( ds[,"B"], mat[,"B"] )
+  ds["b","B"] = 3
+  mat["b","B"] = 3
+  checkIdentical( ds[,], mat,"After re-setting some values" )
+  char.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=dimnames(fs))
+  char.mat = structure(char.mat, levels=levels(fs), class="factor")
+  checkIdentical( fs[,], char.mat )
+  checkIdentical( fs[,1], char.mat[,1] )
+  checkIdentical( fs[2,], char.mat[2,] )
+}
+
+test_write <- function() {
+  ds[1,1] = 5
+  checkIdentical(ds[1,1],5,"Writing to a BigMatrix")
+  ds[2,] = 5
+  checkIdentical(ds[2,],c(A=5,B=5,C=5),"Writing row to a BigMatrix")
+  ds[,2] = 7
+  checkIdentical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix")
+  ds[,] = mat
+  checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix")
+  Sys.chmod(ds$descpath,"0444")
+  checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable description file")
+  Sys.chmod(ds$descpath,"0644")
+  fs[,] = int.mat
+  fs[,1] = 1:3
+  returned.factor = factor(structure(c("AA","BB",NA),names=letters[1:3]),levels=levels)
+  checkEquals(fs[,1], returned.factor, "Setting BigMatrixFactor with integers")
+  fs[,1] = c("BB",NA,"AA")
+  returned.factor = factor(structure(c("BB",NA,"AA"),names=letters[1:3]),levels=levels)
+  checkIdentical(fs[,1], returned.factor, "Setting BigMatrixFactor with characters")
+  return(TRUE)
+}
+
+test_describing <- function() {
+  checkEquals(nrow(ds),nrow(mat))
+  checkEquals(ncol(ds),ncol(mat))
+  checkEquals(dim(ds),dim(mat))
+  checkEquals(length(ds),length(mat))
+  checkIdentical(dimnames(ds),dimnames(mat))
+  checkException( { dimnames(ds) = list(LETTERS[1:3],letters[1:3]) })
+  checkException( { colnames(ds) = LETTERS[1:3] } )
+  checkException( { rownames(ds) = LETTERS[1:3] } )
+  checkException( { ds$colnames(LETTERS[1:3]) } )
+  checkException( { ds$rownames(LETTERS[1:3]) } )
+}
+
+test_reattach <- function() {
+  mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
+  data.file = tempfile()
+  old.ds = BigMatrix(mat,data.file,3,3,list(rownames,colnames))
+  object.file = paste(data.file,".rds",sep="")
+  saveRDS(old.ds,file=object.file)
+  new.ds = readRDS(object.file)
+  checkEquals( new.ds[,], mat )
+
+  if (Sys.info()[["sysname"]] != "Windows") {
+    Sys.chmod(old.ds$descpath,"0000")
+    checkException(old.ds$attach(),silent=TRUE)
+    Sys.chmod(old.ds$descpath,"0644")
+  }
+  
+  Sys.chmod(data.file,"0400")
+  checkException(old.ds$attach(),silent=TRUE)
+  Sys.chmod(data.file,"0600")
+  checkEquals( old.ds[,], mat )
+
+  file.rename(data.file,file.path(tempdir(),"shoe"))
+  Sys.chmod(old.ds$descpath,"0600")
+  if (Sys.info()[["sysname"]] != "Windows") {
+    checkException(old.ds$attach(),silent=TRUE,"Missing backing file")
+  }
+  file.rename(old.ds$descpath,file.path(tempdir(),"shoe2"))
+  checkException(old.ds$attach(),silent=TRUE,"Missing descriptor file")
+}
+
+test_levels <- function() {
+  checkIdentical( levels(fs), c("AA","BB") )
+  checkIdentical( fs$levels, c("AA","BB") )
+  checkException( fs$levels <- c("AB","QQ"), silent=TRUE )
+  checkException( levels(fs) <- c("AB","QQ"), silent=TRUE )
+}
+
+test_nlevels <- function() {
+  checkEquals( nlevels(fs), 2L )
+}
+
+test_paths <- function() {
+  desc.file = paste(ds.data.file,"desc.rds",sep=".")
+  checkEquals(normalizePath(ds$datapath),ds.data.file)
+  checkEquals(normalizePath(ds$descpath),desc.file)
+  new.data.file = tempfile()
+  new.ds = BigMatrix(mat,new.data.file,3,3,list(rownames,colnames))
+  even.newer.data.file = tempfile()
+  checkException({new.ds$datapath = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
+  file.copy(ds.data.file,even.newer.data.file)
+  new.ds$datapath = even.newer.data.file
+  even.newer.data.file = normalizePath(even.newer.data.file)
+  checkEquals(normalizePath(new.ds$datapath),even.newer.data.file)
+  checkEquals(new.ds[,], ds[,])
+}
