@@ -77,7 +77,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                }
                                desc@description$filename = basename(value)
                                saveRDS(desc,file=.self$descpath)
-                               .self$attach()
+                               .self$attach(force=TRUE)
                                validObject(.self)
                              }
                            },
@@ -109,27 +109,31 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            length = function() {
                              return(base::length(.self$bigmat))
                            },
-                           attach=function() {
-                             cat("Attaching to on-disk data:", .self$descpath, "...\n")
-                             if ( ! file.exists(.self$descpath) ) {
-                               stop("Descriptor file ",.self$descpath," does not exist.")
+                           attach=function(force=FALSE) {
+                             if (force == FALSE && ! is.nil(.self$.bm@address)) {
+                               cat("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
+                             } else {
+                               cat("Attaching to on-disk data:", .self$descpath, "...\n")
+                               if ( ! file.exists(.self$descpath) ) {
+                                 stop("Descriptor file ",.self$descpath," does not exist.")
+                               }
+                               if ( file.access(.self$descpath,4) != 0 ) {
+                                 stop("Can not attach to descriptor file without read permissions.")
+                               }
+                               tryCatch( { desc = readRDS(.self$descpath) },
+                                        error = function(e) {  simpleError("Failed to attach big.matrix on disk component.\n") } )
+                               backingfile = file.path(dirname(.self$descpath),desc@description$filename)
+                               if ( ! file.exists(backingfile) ) {
+                                 stop("Backing file ",backingfile," does not exist.")
+                               }
+                               if ( file.access( backingfile, 4 ) != 0 ) {
+                                 stop("Can not attach to backing file without read permissions on the backing file.")
+                               }
+                               tryCatch({
+                                 .self$.bm = attach.big.matrix(desc,path=dirname(.self$descpath))
+                               },
+                                        error = function(e) {  simpleError("Failed to attach big.matrix on disk component.\n") } )
                              }
-                             if ( file.access(.self$descpath,4) != 0 ) {
-                               stop("Can not attach to descriptor file without read permissions.")
-                             }
-                             tryCatch( { desc = readRDS(.self$descpath) },
-                             error = function(e) {  simpleError("Failed to attach big.matrix on disk component.\n") } )
-                             backingfile = file.path(dirname(.self$descpath),desc@description$filename)
-                             if ( ! file.exists(backingfile) ) {
-                               stop("Backing file ",backingfile," does not exist.")
-                             }
-                             if ( file.access( backingfile, 4 ) != 0 ) {
-                               stop("Can not attach to backing file without read permissions on the backing file.")
-                             }
-                             tryCatch({
-                               .self$.bm = attach.big.matrix(desc,path=dirname(.self$descpath))
-                             },
-                             error = function(e) {  simpleError("Failed to attach big.matrix on disk component.\n") } )
                            },
                            getValues=function(i,j,drop=TRUE) {
                              object = .self$bigmat

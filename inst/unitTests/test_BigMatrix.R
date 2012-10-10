@@ -72,10 +72,10 @@ test_write <- function() {
   ds[,] = mat
   checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix")
   Sys.chmod(ds$datapath,"0444")
-  ds$attach()
+  ds$attach(force=TRUE)
   checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
   Sys.chmod(ds$datapath,"0644")
-  ds$attach()
+  ds$attach(force=TRUE)
   fs[,] = int.mat
   fs[,1] = 1:3
   returned.factor = factor(structure(c("AA","BB",NA),names=letters[1:3]),levels=levels)
@@ -109,17 +109,17 @@ test_reattach <- function() {
 
   if (Sys.info()[["sysname"]] != "Windows") {
     Sys.chmod(old.ds$descpath,"0000")
-    checkException(old.ds$attach(),silent=TRUE)
+    checkException(old.ds$attach(force=TRUE),silent=TRUE)
     Sys.chmod(old.ds$descpath,"0644")
   }
   
   file.rename(data.file,file.path(tempdir(),"shoe"))
   Sys.chmod(old.ds$descpath,"0600")
   if (Sys.info()[["sysname"]] != "Windows") {
-    checkException(old.ds$attach(),silent=TRUE,"Missing backing file")
+    checkException(old.ds$attach(force=TRUE),silent=TRUE,"Missing backing file")
   }
   file.rename(old.ds$descpath,file.path(tempdir(),"shoe2"))
-  checkException(old.ds$attach(),silent=TRUE,"Missing descriptor file")
+  checkException(old.ds$attach(force=TRUE),silent=TRUE,"Missing descriptor file")
 }
 
 test_levels <- function() {

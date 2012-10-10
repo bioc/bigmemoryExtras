@@ -118,6 +118,8 @@ ds$ncol()
     \item{length}{\code{signature(x = "BigMatrix")}: Get the number of cells in the matrix. }
     \item{\code{setValues(i, j, value)}:}{ Setter for on-disk data. }
     \item{\code{getValues(i, j, drop)}:}{ Getter for on-disk data. }
-    \item{\code{attach()}:}{ Uses path from descpath field to connect object to on-disk data. }
+    \item{\code{attach()}:}{ Uses path from descpath field to connect
+      object to on-disk data. 'force' argument will force re-attachment
+      of an object that is already attached.}
   }
 }
