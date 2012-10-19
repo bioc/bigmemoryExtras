@@ -111,9 +111,9 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            },
                            attach=function(force=FALSE) {
                              if (force == FALSE && ! is.nil(.self$.bm@address)) {
-                               cat("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
+                               message("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
                              } else {
-                               cat("Attaching to on-disk data:", .self$descpath, "...\n")
+                               message("Attaching to on-disk data:", .self$descpath, "...\n")
                                if ( ! file.exists(.self$descpath) ) {
                                  stop("Descriptor file ",.self$descpath," does not exist.")
                                }
