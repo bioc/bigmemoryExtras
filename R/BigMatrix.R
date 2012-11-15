@@ -176,11 +176,11 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              saveRDS( describe(.self$bigmat), file=.self$descpath )
                            },
                            show=function() {
-                             cat( class(.self), "\ndescpath:", .self$descpath, "\ndatapath:", .self$datapath, "\nnrow:", .self$nrow(), "\nncol:", .self$ncol(), "\n")
+                             message( class(.self), "\ndescpath:", .self$descpath, "\ndatapath:", .self$datapath, "\nnrow:", .self$nrow(), "\nncol:", .self$ncol(), "\n")
                              if (is.nil(.self$.bm@address)) {
-                               cat("Object is not currently attached to on-disk data.\n")
+                               message("Object is not currently attached to on-disk data.\n")
                              } else {
-                               cat("Object is currently attached to on-disk data.\n")
+                               message("Object is currently attached to on-disk data.\n")
                              }
                            }
                            )
@@ -352,7 +352,7 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                  },
                                  show=function() {
                                    callSuper()
-                                   cat("Levels:", .self$levels, "\n")
+                                   message("Levels:", .self$levels, "\n")
                                  }
                                 )
                                )
