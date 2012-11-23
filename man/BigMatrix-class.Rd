@@ -7,6 +7,7 @@
 \alias{[<-,BigMatrix,ANY,ANY,ANY-method}
 \alias{annotatedDataFrameFrom,BigMatrix-method}
 \alias{coerce,BigMatrix,matrix-method}
+\alias{as.matrix,BigMatrix-method}
 \alias{dim,BigMatrix-method}
 \alias{dimnames,BigMatrix-method}
 \alias{dimnames<-,BigMatrix,ANY-method}
@@ -57,7 +58,9 @@ S4-style methods supplement ReferenceClass methods to provide a standard matrix 
     \item{[<-}{\code{signature(x = "BigMatrix", i = "ANY", j = "ANY")}: Set matrix data. }
     \item{[<-}{\code{signature(x = "BigMatrix", i = "ANY", j = "ANY", NA = "ANY")}: Set matrix data }
     \item{annotatedDataFrameFrom}{\code{signature(object = "BigMatrix")}: Used in creation of a Biobase eSet with a BigMatrix as an assayDataElement. }
-    \item{coerce}{\code{signature(from = "BigMatrix", to = "matrix")}: Coerce BigMatrix to a base matrix. }
+    \item{coerce}{\code{signature(from = "BigMatrix", to = "matrix")}:
+      Coerce BigMatrix to a base matrix. }
+    \item{as.matrix}{\code{signature(x = "BigMatrix")}: Coerce BigMatrix to a base matrix. }
     \item{dim}{\code{signature(x = "BigMatrix")}: Get dimensions of the matrix. }
     \item{dimnames}{\code{signature(x = "BigMatrix")}: Get dimension
       names of the matrix. }

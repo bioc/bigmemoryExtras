@@ -41,8 +41,10 @@ test_creation <- function() {
 
 test_coercion <- function() {
   checkEquals( ds[,], as(ds,"matrix") )
+  checkEquals( ds[,], as.matrix(ds) )
   checkEquals( as(fs[,],"matrix"), as(fs,"matrix") )
   checkEquals( fs[,], as(fs,"factor") )
+  checkEquals( fs[,], as.matrix(fs) )
 }
 
 test_subset <- function() {

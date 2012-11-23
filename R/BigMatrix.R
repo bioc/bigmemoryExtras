@@ -255,6 +255,7 @@ setMethod('length', signature(x="BigMatrix"),
           })
 
 setAs("BigMatrix","matrix", function(from) { return(from[,]) })
+setMethod("as.matrix",signature(x="BigMatrix"), function(x) { return(x[,]) })
 
 ##' Create a new BigMatrix-derived class
 ##'
