@@ -14,6 +14,7 @@
 \alias{length,BigMatrix-method}
 \alias{ncol,BigMatrix-method}
 \alias{nrow,BigMatrix-method}
+\alias{apply,BigMatrix-method}
 
 \title{Class \code{"BigMatrix"}}
 \description{
@@ -68,7 +69,10 @@ S4-style methods supplement ReferenceClass methods to provide a standard matrix 
       Set dimension names }
     \item{length}{\code{signature(x = "BigMatrix")}: Get length of the vector used as a matrix (nrow * ncol). }
     \item{ncol}{\code{signature(x = "BigMatrix")}: Get the number of columns in the matrix. }
-    \item{nrow}{\code{signature(x = "BigMatrix")}: Get the number of rows in the matrix. }
+    \item{nrow}{\code{signature(x = "BigMatrix")}: Get the number of
+      rows in the matrix. }
+    \item{apply}{\code{signature(X = "BigMatrix")}: Apply a function
+      over one margin of the data in a BigMatrix, borrowing from biganalytics. }
 	 }
 }
 \author{

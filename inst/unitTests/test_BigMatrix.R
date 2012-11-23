@@ -149,3 +149,7 @@ test_paths <- function() {
   checkEquals(normalizePath(new.ds$datapath),even.newer.data.file)
   checkEquals(new.ds[,], ds[,])
 }
+
+test_apply <- function() {
+  checkEquals( apply( ds, 1, mean ), apply( mat, 1, mean ), "apply on BigMatrix just like apply on base matrix" )
+}

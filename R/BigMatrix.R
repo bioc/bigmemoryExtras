@@ -27,6 +27,7 @@
 ##' @import bigmemory
 ##' @importClassesFrom Biobase AnnotatedDataFrame AssayData
 ##' @importFrom Biobase annotatedDataFrameFrom assayDataElementNames assayDataElement
+##' @importFrom biganalytics apply
 NULL
 
 ### Modifications to big.matrix object from bigmemory to help with saving to and restoring from disk and to prevent usage of a nil address
@@ -254,8 +255,12 @@ setMethod('length', signature(x="BigMatrix"),
             return(x$length())
           })
 
-setAs("BigMatrix","matrix", function(from) { return(from[,]) })
+##' @exportMethod as.matrix
 setMethod("as.matrix",signature(x="BigMatrix"), function(x) { return(x[,]) })
+setAs("BigMatrix","matrix", function(from) { return(from[,]) })
+
+##' @exportMethod apply
+setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { apply(X$bigmat, MARGIN, FUN, ...) })
 
 ##' Create a new BigMatrix-derived class
 ##'
