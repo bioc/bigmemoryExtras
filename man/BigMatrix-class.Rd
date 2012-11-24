@@ -21,16 +21,15 @@
 This package defines a "BigMatrix" ReferenceClass which adds
 safety and convenience features to the filebacked.big.matrix class from the
 bigmemory package. BigMatrix protects against segfaults by monitoring and
-gracefully restoring the connection to on-disk data and it also protects
-against accidental data modification with a filesystem-based permissions
-system. We provide utilities for using BigMatrix-derived classes as
+gracefully restoring the connection to on-disk data. We provide
+utilities for using BigMatrix-derived classes as
 assayData matrices within the Biobase package's eSet family of classes.
 BigMatrix provides some optimizations related to attaching to, and indexing
 into, file-backed matrices with dimnames.
 
 A big.matrix object is backed by two files, a data file (backingfile)
-and a text metadata file (descriptor file). BigMatrix stores 
-the metadata in an additional binary "rds" file, for faster access. The location of this file 
+and a text metadata file (descriptor file). BigMatrix replaces 
+the text metadata file with a binary "rds" file, for faster access. The location of this file 
 is stored in the \code{descpath} field. The data in the metadata file is used to "attach" a 
 big.matrix object its on-disk data. BigMatrix stores the big.matrix object and checks for a 
 valid connection to the on-disk data each time it is necessary to access the big.matrix object. 

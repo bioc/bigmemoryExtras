@@ -303,6 +303,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
     stop("Argument x must be NULL, matrix, or big.matrix.\n")
   }
   descpath = file.path(backingpath,paste(descriptorfile,".rds",sep=""))
+  unlink(file.path(backingpath,descriptorfile))  # Delete bigmemory version of desc file until they stop using dput/dget
   bm = getRefClass(class)$new(.bm=new.matrix,descpath=descpath, ...)
   bm$save()
   if (!validObject(bm)) {

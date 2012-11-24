@@ -72,15 +72,13 @@ new.ds[1:2,2:3]
 @ 
 
 \section{Files}
-The bigmemory package creates two files for each object, and BigMatrix adds a
-third. The bigmemory package creates one binary file for the matrix
+The bigmemory package creates two files for each object: one binary file for the matrix
 data (the ``backingfile'') and one text file with meta-data about its
 matrix (the ``descriptor'' file). The functions dget and dput are used to access
 this meta-data. For large matrices with dimnames, this can take a
-while. BigMatrix uses readRDS and saveRDS to store meta-data in a
-third file, which requires about 1/10 the time to read when it's time
-to attach an object to the backingfile. Use of a separate file allows access to the
-on-disk data via big.matrix or BigMatrix objects.
+while. BigMatrix replaces the descriptor file with a binary one that uses readRDS and saveRDS, 
+which requires about 1/10 the time to read when it's time
+to attach an object to the backingfile.
 
 \section{S4 Style Access}
 The BigMatrix class uses R's Reference Class system. Any change to the
