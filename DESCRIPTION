@@ -37,3 +37,4 @@ Collate:
     'eset.R'
     'zzz.R'
     'test_bigmemoryExtras_package.R'
+    'BigMatrixFactor.R'
