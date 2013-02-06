@@ -87,16 +87,22 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            ),
                          methods=list(
                            colnames = function(value) {
-                             if (!missing(value)) { stop("Dimnames are read-only to avoid synchronicity issues with the on-disk data.") }
-                             return(base::colnames(.self$bigmat))
+                             if (missing(value)) {
+                               return(base::colnames(.self$bigmat))
+                             }
+                             base::colnames(.self$bigmat) = value
                            },
                            rownames = function(value) {
-                             if (!missing(value)) { stop("Dimnames are read-only to avoid synchronicity issues with the on-disk data.") }
-                             return(base::rownames(.self$bigmat))
+                             if (missing(value)) {
+                               return(base::rownames(.self$bigmat))
+                             }
+                             base::rownames(.self$bigmat) = value
                            },
                            dimnames = function(value) {
-                             if (!missing(value)) { stop("Dimnames are read-only to avoid synchronicity issues with the on-disk data.") }
-                             return(base::dimnames(.self$bigmat))
+                             if (missing(value)) {
+                               return(base::dimnames(.self$bigmat))
+                             }
+                             base::dimnames(.self$bigmat) = value
                            },
                            dim  = function() {
                              return(base::dim(.self$bigmat))
@@ -228,7 +234,8 @@ setMethod('dimnames', signature(x="BigMatrix"),
 ##' @exportMethod 'dimnames<-'
 setMethod('dimnames<-', signature(x="BigMatrix",value="ANY"),
           function(x,value) {
-            stop("Dimnames are read-only to avoid synchronicity issues with the on-disk data.")
+            x$dimnames(value)
+            return(x)
           })
 
 ##' @exportMethod nrow

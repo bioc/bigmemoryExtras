@@ -88,16 +88,26 @@ test_write <- function() {
 }
 
 test_describing <- function() {
+  mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+  # Getting
   checkEquals(nrow(ds),nrow(mat))
   checkEquals(ncol(ds),ncol(mat))
   checkEquals(dim(ds),dim(mat))
   checkEquals(length(ds),length(mat))
   checkIdentical(dimnames(ds),dimnames(mat))
-  checkException( { dimnames(ds) = list(LETTERS[1:3],letters[1:3]) })
-  checkException( { colnames(ds) = LETTERS[1:3] } )
-  checkException( { rownames(ds) = LETTERS[1:3] } )
-  checkException( { ds$colnames(LETTERS[1:3]) } )
-  checkException( { ds$rownames(LETTERS[1:3]) } )
+  # Setting
+  new.dimnames = list(letters[4:6], LETTERS[4:6])
+  dimnames(ds) = new.dimnames
+  checkIdentical(dimnames(ds), new.dimnames)
+  
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+  colnames(ds) = new.dimnames[[2]]
+  checkIdentical(colnames(ds), new.dimnames[[2]])
+
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+  rownames(ds) = new.dimnames[[1]]
+  checkIdentical(rownames(ds), new.dimnames[[1]])
 }
 
 test_reattach <- function() {
