@@ -25,7 +25,7 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                  },
                                  show=function() {
                                    callSuper()
-                                   message("Levels:", .self$levels, "\n")
+                                   message("Levels:", paste(.self$levels, collapse=" "), "\n")
                                  }
                                 )
                                )
