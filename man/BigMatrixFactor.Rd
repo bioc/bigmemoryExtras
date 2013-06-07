@@ -6,8 +6,9 @@
     dimnames, levels)
 }
 \arguments{
-  \item{x}{NULL, matrix, or big.matrix. Optional data or
-  big.matrix for new BigMatrix}
+  \item{x}{scalar numeric, NULL, matrix, or big.matrix.
+  Optional data or big.matrix for new BigMatrix. A scalar
+  numeric can be used to initalize the whole matrix.}
 
   \item{backingfile}{character, full path to the file that
   will contain the data matrix}

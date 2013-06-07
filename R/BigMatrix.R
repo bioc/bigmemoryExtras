@@ -298,8 +298,9 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
                error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
     }
     new.matrix = x
-  } else if (is.null(x)) {
+  } else if (is.null(x) || (is.numeric(x) && length(x) == 1)) {
     new.matrix = filebacked.big.matrix(
+      init=x, 
       nrow=nrow,ncol=ncol,
       type=type,
       backingfile=backingfile,
@@ -307,7 +308,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
       backingpath=backingpath,
       dimnames=dimnames)
   } else {
-    stop("Argument x must be NULL, matrix, or big.matrix.\n")
+    stop("Argument x must be a scalar numeric, matrix, or big.matrix.\n")
   }
   descpath = file.path(backingpath,paste(descriptorfile,".rds",sep=""))
   unlink(file.path(backingpath,descriptorfile))  # Delete bigmemory version of desc file until they stop using dput/dget
@@ -322,7 +323,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' Create a new BigMatrix
 ##'
 ##' Create a new BigMatrix
-##' @param x NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix
+##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix. A scalar numeric can be used to initalize the whole matrix.
 ##' @param backingfile character, full path to the file that will contain the data matrix
 ##' @param nrow integer, number of rows in the matrix we are about to create
 ##' @param ncol integer, number of columns in the matrix we are about to create

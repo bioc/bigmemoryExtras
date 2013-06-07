@@ -34,7 +34,7 @@ BigMatrixFactorGenerator$lock("levels")
 ##' Create a new BigMatrixFactor
 ##'
 ##' Create a new BigMatrixFactor
-##' @param x NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix
+##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix. A scalar numeric can be used to initalize the whole matrix.
 ##' @param backingfile character, full path to the file that will contain the data matrix
 ##' @param nrow integer, number of rows in the matrix we are about to create
 ##' @param ncol integer, number of columns in the matrix we are about to create
