@@ -112,23 +112,34 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                                         error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
                              }
                            },
-                           getValues=function(i,j,drop=TRUE) {
+                           getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
                              if (!missing(i) && is.character(i)) { i = match(i,.self$rownames) }
                              if (!missing(j) && is.character(j)) { j = match(j,.self$colnames) }
                              if (missing(i)) {
                                if (missing(j)) {
-                                 return(object[,,drop=drop])
+                                 x = object[,,drop=drop]
                                } else {
-                                 return(object[,j,drop=drop])
-                               }
+                                 x = object[,j,drop=drop]
+                                 }
                              } else {
                                if (missing(j)) {
-                                 return(object[i,,drop=drop])
+                                 x = object[i,,drop=drop]
                                } else {
-                                 return(object[i,j,drop=drop])
+                                 x = object[i,j,drop=drop]
                                }
                              }
+                             if (withDimnames == TRUE && base::length(x) > 1) {
+                               if (is.matrix(x)) {
+                                 if (missing(i)) { i = seq.int(1, .self$nrow())}
+                                 if (missing(j)) { j = seq.int(1, .self$ncol())}
+                                 dimnames(x) = list(.self$rownames[i], .self$colnames[j])
+                               } else {
+                                 if (missing(i)) { names(x) = .self$rownames }
+                                 if (missing(j)) { names(x) = .self$colnames }
+                               }
+                             }
+                             return(x)
                            },
                            setValues=function(i,j,value) {
                              object = .self$bigmat
@@ -178,8 +189,8 @@ setValidity("BigMatrix2", function(object) {
 
 ##' @exportMethod '['
 setMethod('[', signature(x = "BigMatrix2"),
-          function(x,i,j,drop=TRUE) {
-            return(x$getValues(i,j,drop=drop))
+          function(x,i,j,..., drop=TRUE) {
+            return(x$getValues(i,j,..., drop=drop))
           })
 
 ##' @exportMethod '[<-'
