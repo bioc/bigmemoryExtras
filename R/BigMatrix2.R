@@ -27,6 +27,7 @@
 ##' @import bigmemory
 ##' @importClassesFrom Biobase AnnotatedDataFrame AssayData
 ##' @importFrom Biobase annotatedDataFrameFrom assayDataElementNames assayDataElement
+##' @importFrom BiocGenerics updateObject
 ##' @importFrom biganalytics apply
 NULL
 
@@ -317,3 +318,24 @@ BigMatrix2 <- function(x=NULL,backingfile,nrow,ncol,dimnames=NULL,type="double")
   return( bm )
 }
 
+##' Update previous BigMatrix type to new BigMatrix
+##'
+##' BigMatrix has changed some of its internal storage to eliminate the descriptor file and to keep the dimnames on the R side. This function will take a
+##' Version <= 1.3 type and update it to the Version >=1.4 type.
+##' @param object BigMatrix
+##' @export 
+##' @return BigMatrix
+setMethod("updateObject", signature="BigMatrix2", function(object) {
+  desc = describe(object$bigmat)
+  desc.list = desc@description
+  dimnames = list(desc.list$rowNames, desc.list$colNames)
+  desc.list$rowNames = desc.list$colNames = NULL
+  new.desc = new('big.matrix.descriptor',  description=desc.list)
+  bm = attach.resource(new.desc, path=dirname(object$datapath))
+  if (class(object) == "BigMatrixFactor") {
+    bigmat = BigMatrix2(x=bm, backingfile=object$datapath, dimnames=dimnames, levels=object$levels)
+  } else {
+    bigmat = BigMatrix2(x=bm, backingfile=object$datapath, dimnames=dimnames)
+  }
+  return(bigmat)
+})
