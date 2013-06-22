@@ -112,6 +112,7 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                                },
                                         error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
                              }
+                             if ("datapath" %in% ls(.self)) { warning("Attaching an older type of BigMatrix. Use updateObject method to update.") }
                            },
                            getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
@@ -325,8 +326,10 @@ BigMatrix2 <- function(x=NULL,backingfile,nrow,ncol,dimnames=NULL,type="double")
 ##' @param object BigMatrix
 ##' @export 
 ##' @return BigMatrix
-setMethod("updateObject", signature="BigMatrix2", function(object) {
-  desc = describe(object$bigmat)
+setMethod("updateObject", signature=signature(object="BigMatrix"), function(object) {
+  tryCatch(
+    { desc = readRDS(object$descpath) }, 
+    error = function(e) { stop(sprintf("Failed to read descriptor file when updating BigMatrix.%s\n", e))} )
   desc.list = desc@description
   dimnames = list(desc.list$rowNames, desc.list$colNames)
   desc.list$rowNames = desc.list$colNames = NULL
@@ -339,3 +342,5 @@ setMethod("updateObject", signature="BigMatrix2", function(object) {
   }
   return(bigmat)
 })
+
+# benchmark(x = theta$getValues(,  1),  y = theta2$getValues(,  1),  z = theta2$getValues(,  1,  withDimnames=FALSE),  replications=5)
