@@ -39,3 +39,4 @@ Collate:
     'eset.R'
     'zzz.R'
     'test_bigmemoryExtras_package.R'
+    'BigMatrix2.R'

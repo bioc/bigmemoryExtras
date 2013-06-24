@@ -33,25 +33,12 @@ NULL
 
 ### Modifications to big.matrix object from bigmemory to help with saving to and restoring from disk and to prevent usage of a nil address
 
-# What to do with description?  Currently really slow to attach as reading dimnames from desc file with dget is 10X the time of reading same info with load
-# Option 1: Dimnames and description as fields, use desc file only for checking read permissions.
-#    Would need to overwrite getters and setters: "[", dimnames, object creation would need to put these in their slots too
-# Option 2: Replace description file with a RData file with same content.  Use finalize method to flush dimnames to desc file. Dimnames as field, or let big.matrix keep them?
-#    Dimnames stay with data file +/- sync errors.  Data files useful independent of object. Maybe that is bad as col/row ordering for one element of a GenoSet could change.
-#    Would be simpler overall
-#    Would need save, finalize methods
-#    Who does a better job using dimnames, R or big.matrix? Speed of indexing, etc.
-#    I'll have to read the desc myself, so should I keep it in a field and make use of it?  Remove dimnames from desc for attach to avoid giving them to big.matrix?
-#    Ooh, could use readRDS and saveRDS, like load/save, but for one object.  No need to deal with getting names of stuff from load.
-#    Maybe want third file with rds version of desc so it could still be a useful big.matrix object?
-#    Could save dimnames in finalize, but useful to have many objects pointing to the same big.matrix (SNOW, etc.).  Don't want contention. Don't have locking?
-
 # Initialize can't require args or have side-effects, so can not create on-disk elements with initialize. Have to do "BigMatrix" function (and/or method?) for users to initialize
 
 ########################
 ###  Class BigMatrix ###
 ########################
-
+setClassUnion("characterOrNull",c("character","NULL"))
 BigMatrix2Generator <- setRefClass("BigMatrix2",
                          fields=list(
                            bigmat=function(value) {
@@ -69,8 +56,8 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                              }
                            },
                            backingfile="character",
-                           .rownames="character", 
-                           .colnames="character",
+                           .rownames="characterOrNull", 
+                           .colnames="characterOrNull",
                            description="list",
                            .bm="big.matrix"
                            ),
@@ -78,24 +65,26 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                            rownames = function(value) {
                              if (missing(value)) {
                                return(.self$.rownames)
-                             } else 
-                               if (length(value) != .self$nrow) { stop("Length of rownames must match the number of rows.") }
+                             } else {
+                               if (base::length(value) != .self$nrow()) { stop("Length of rownames must match the number of rows.") }
                              .self$.rownames = value
+                             }
                            }, 
                            colnames = function(value) {
                              if (missing(value)) {
                                return(.self$.colnames)
-                             } else
-                               if (length(value) != .self$nncol) { stop("Length of colnames must match the number of columns.") }
+                             } else {
+                               if (base::length(value) != .self$ncol()) { stop("Length of colnames must match the number of columns.") }
                              .self$.colnames = value
+                             }
                            }, 
                            dimnames = function(value) {
                              if (missing(value)) {
                                return(list(.self$.rownames, .self$.colnames))
                              } else {
-                               if (length(value) != 2) { stop("dimnames must be set with a list of length 2.") }
-                               .self$.rownames(value[[1]])
-                               .self$.colnames(value[[2]])
+                               if (!is.null(value) && base::length(value) != 2) { stop("dimnames must be set with a list of length 2.") }
+                               .self$.rownames = value[[1]]
+                               .self$.colnames = value[[2]]
                              }
                            },
                            dim  = function() {
@@ -181,7 +170,20 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                              saveRDS( .self, rdsfile )
                            },
                            show=function() {
-                             message( class(.self), "\nbackingfile :", .self$backingfile, "\ndim: ", paste(.self$dim(), collapse=", "), "\n")
+                             message( class(.self),
+                                     "\nbackingfile :", .self$backingfile, "\n", 
+                                     "dim: ", paste(.self$dim(), collapse=", ")
+                                     )
+                             if (!is.null(.self$rownames())) {
+                               message("rownames: ", paste(head(.self$rownames()), collapse=", "), " ...")
+                             } else {
+                               message("rownames: NULL")
+                             }
+                             if (!is.null(.self$colnames())) {
+                               message("colnames: ", paste(head(.self$colnames()), collapse=", "), " ...")
+                             } else {
+                               message("colnames: NULL")
+                             }
                              if (is.nil(.self$.bm@address)) {
                                message("Object is not currently attached to on-disk data.\n")
                              } else {
@@ -289,7 +291,7 @@ setMethod("apply",signature(X="BigMatrix2"), function(X, MARGIN, FUN, ...) { app
     new.matrix = as.big.matrix(x, backingpath=backingpath, descriptorfile=basename(descriptorfile), backingfile=basename(backingfile))
   } else if (is.big.matrix(x)) {
     if( is.nil(x@address) ) {
-      tryCatch( { x = attach.big.matrix(descpath) },
+      tryCatch( { x = attach.big.matrix(descriptorfile) },
                error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
     }
     new.matrix = x
