@@ -69,19 +69,34 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                              }
                            },
                            backingfile="character",
-                           rownames="character", 
-                           colnames="character",
+                           .rownames="character", 
+                           .colnames="character",
                            description="list",
                            .bm="big.matrix"
                            ),
                          methods=list(
+                           rownames = function(value) {
+                             if (missing(value)) {
+                               return(.self$.rownames)
+                             } else 
+                               if (length(value) != .self$nrow) { stop("Length of rownames must match the number of rows.") }
+                             .self$.rownames = value
+                           }, 
+                           colnames = function(value) {
+                             if (missing(value)) {
+                               return(.self$.colnames)
+                             } else
+                               if (length(value) != .self$nncol) { stop("Length of colnames must match the number of columns.") }
+                             .self$.colnames = value
+                           }, 
                            dimnames = function(value) {
                              if (missing(value)) {
-                               return(list(.self$rownames, .self$colnames))
+                               return(list(.self$.rownames, .self$.colnames))
+                             } else {
+                               if (length(value) != 2) { stop("dimnames must be set with a list of length 2.") }
+                               .self$.rownames(value[[1]])
+                               .self$.colnames(value[[2]])
                              }
-                             if (length(value) != 2) { stop("dimnames must be set with a list of length 2.") }
-                             .self$rownames = value[[1]]
-                             .self$colnames = value[[2]]
                            },
                            dim  = function() {
                              return( c( .self$description$nrow, .self$description$ncol ) )
@@ -116,8 +131,8 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                            },
                            getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
-                             if (!missing(i) && is.character(i)) { i = match(i,.self$rownames) }
-                             if (!missing(j) && is.character(j)) { j = match(j,.self$colnames) }
+                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames) }
+                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames) }
                              if (missing(i)) {
                                if (missing(j)) {
                                  x = object[,,drop=drop]
@@ -135,10 +150,10 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                                if (is.matrix(x)) {
                                  if (missing(i)) { i = seq.int(1, .self$nrow())}
                                  if (missing(j)) { j = seq.int(1, .self$ncol())}
-                                 dimnames(x) = list(.self$rownames[i], .self$colnames[j])
+                                 dimnames(x) = list(.self$.rownames[i], .self$.colnames[j])
                                } else {
-                                 if (missing(i)) { names(x) = .self$rownames }
-                                 if (missing(j)) { names(x) = .self$colnames }
+                                 if (missing(i)) { names(x) = .self$.rownames }
+                                 if (missing(j)) { names(x) = .self$.colnames }
                                }
                              }
                              return(x)
@@ -146,8 +161,8 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                            setValues=function(i,j,value) {
                              object = .self$bigmat
                              bigmemory:::checkReadOnly(object)
-                             if (!missing(i) && is.character(i)) { i = match(i,.self$rownames) }
-                             if (!missing(j) && is.character(j)) { j = match(j,.self$colnames) }
+                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames) }
+                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames) }
                              if (missing(i)) {
                                if (missing(j)) {
                                  object[,] <- value
@@ -291,7 +306,7 @@ setMethod("apply",signature(X="BigMatrix2"), function(X, MARGIN, FUN, ...) { app
   }
   unlink(file.path(backingpath,descriptorfile))  # Delete bigmemory version of desc file until they stop using dput/dget
   description = describe(new.matrix)@description # description method is not exported and it just does this anyway
-  bm = getRefClass(class)$new(.bm=new.matrix, description=description, backingfile=backingfile, rownames=dimnames[[1]], colnames=dimnames[[2]], ...)
+  bm = getRefClass(class)$new(.bm=new.matrix, description=description, backingfile=backingfile, .rownames=dimnames[[1]], .colnames=dimnames[[2]], ...)
   if (!validObject(bm)) {
     stop("Failed to create a valid ", class, "!\n")
   }
