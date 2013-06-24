@@ -54,10 +54,10 @@ test_write <- function() {
   checkIdentical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix2")
   ds[,] = mat
   checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix2")
-  Sys.chmod(ds$datapath,"0444")
+  Sys.chmod(ds$backingfile,"0444")
   ds$attach(force=TRUE)
   checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix2 with a non-writeable data file")
-  Sys.chmod(ds$datapath,"0644")
+  Sys.chmod(ds$backingfile,"0644")
   ds$attach(force=TRUE)
 }
 
@@ -92,34 +92,20 @@ test_reattach <- function() {
   saveRDS(old.ds,file=object.file)
   new.ds = readRDS(object.file)
   checkEquals( new.ds[,], mat )
-
-  if (Sys.info()[["sysname"]] != "Windows") {
-    Sys.chmod(old.ds$descpath,"0000")
-    checkException(old.ds$attach(force=TRUE),silent=TRUE)
-    Sys.chmod(old.ds$descpath,"0644")
-  }
-  
-  file.rename(data.file,file.path(tempdir(),"shoe"))
-  Sys.chmod(old.ds$descpath,"0600")
-  if (Sys.info()[["sysname"]] != "Windows") {
-    checkException(old.ds$attach(force=TRUE),silent=TRUE,"Missing backing file")
-  }
-  file.rename(old.ds$descpath,file.path(tempdir(),"shoe2"))
+  file.rename(old.ds$backingfile,file.path(tempdir(),"shoe2"))
   checkException(old.ds$attach(force=TRUE),silent=TRUE,"Missing descriptor file")
 }
 
 test_paths <- function() {
-  desc.file = paste(ds.data.file,"desc.rds",sep=".")
-  checkEquals(normalizePath(ds$datapath),ds.data.file)
-  checkEquals(normalizePath(ds$descpath),desc.file)
+  checkEquals(normalizePath(ds$backingfile),ds.data.file)
   new.data.file = tempfile()
   new.ds = BigMatrix2(mat,new.data.file,3,3,list(rownames,colnames))
   even.newer.data.file = tempfile()
-  checkException({new.ds$datapath = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
+  checkException({new.ds$backinfile = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
   file.copy(ds.data.file,even.newer.data.file)
-  new.ds$datapath = even.newer.data.file
+  new.ds$backingfile = even.newer.data.file
   even.newer.data.file = normalizePath(even.newer.data.file)
-  checkEquals(normalizePath(new.ds$datapath),even.newer.data.file)
+  checkEquals(normalizePath(new.ds$backingfile),even.newer.data.file)
   checkEquals(new.ds[,], ds[,])
 }
 
