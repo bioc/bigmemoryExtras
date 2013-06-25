@@ -110,5 +110,12 @@ test_paths <- function() {
 }
 
 test_update <- function() {
-  
+  object.file = system.file("unitTests/tdata/old.ds.rda", package="bigmemoryExtras")
+  desc.file = system.file("unitTests/tdata/ds.desc.rds", package="bigmemoryExtras")
+  ds = get(load(object.file))
+  ds$descpath = desc.file
+  newds = updateObject(ds)
+  checkTrue(validObject(newds))
+  checkIdentical(rownames, rownames(newds))
+  checkIdentical(colnames, colnames(newds))
 }
