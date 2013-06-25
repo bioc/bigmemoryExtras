@@ -296,7 +296,6 @@ setMethod("apply",signature(X="BigMatrix2"), function(X, MARGIN, FUN, ...) { app
     }
     new.matrix = x
   } else if (is.null(x) || (is.numeric(x) && length(x) == 1)) {
-    browser()
     new.matrix = filebacked.big.matrix(
       init=x, 
       nrow=nrow,ncol=ncol,

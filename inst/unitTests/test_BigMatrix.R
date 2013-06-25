@@ -7,8 +7,8 @@ char.mat = matrix()
   
 back.dir = tempdir()
 ds.data.file = file.path(back.dir,"bigmat","ds")
-ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 ds.data.file = normalizePath(ds.data.file)
+ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 fs.data.file = file.path(back.dir,"bigmat","fs")
 fs = BigMatrixFactor(int.mat,fs.data.file,3,3,list(rownames,colnames),levels=levels)
 
