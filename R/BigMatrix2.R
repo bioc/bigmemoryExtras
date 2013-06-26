@@ -137,12 +137,14 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                              }
                              if (withDimnames == TRUE && base::length(x) > 1) {
                                if (is.matrix(x)) {
-                                 if (missing(i)) { i = seq.int(1, .self$nrow())}
-                                 if (missing(j)) { j = seq.int(1, .self$ncol())}
-                                 dimnames(x) = list(.self$.rownames[i], .self$.colnames[j])
+                                 if (!is.null(.self$rownames) && !is.null(.self$colnames)) {
+                                   if (missing(i)) { i = seq.int(1, .self$nrow())}
+                                   if (missing(j)) { j = seq.int(1, .self$ncol())}
+                                   dimnames(x) = list(.self$.rownames[i], .self$.colnames[j])
+                                 }
                                } else {
-                                 if (missing(i)) { names(x) = .self$.rownames }
-                                 if (missing(j)) { names(x) = .self$.colnames }
+                                 if (missing(i) && !is.null(.self$rownames)) { names(x) = .self$.rownames }
+                                 if (missing(j) && !is.null(.self$colnames)) { names(x) = .self$.colnames }
                                }
                              }
                              return(x)
