@@ -98,6 +98,13 @@ test_write <- function() {
   fs[,1] = c("BB",NA,"AA")
   returned.factor = factor(structure(c("BB",NA,"AA"),names=letters[1:3]),levels=levels)
   checkIdentical(fs[,1], returned.factor, "Setting BigMatrixFactor with characters")
+
+  fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
+  fs[, 1] = c(-1, 0, 1, 2, 4)
+  checkIdentical( as.character(fs[, ]), c(NA, NA, "AA", "BB", NA, rep("AA", 20)), "Setting BMF with bad integers gives NAs")
+  fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
+  fs[, 1] = c("AA", "SHOE", "GOO", "AA", "BB")
+  checkIdentical( as.character(fs[, ]), c("AA", NA, NA, "AA", "BB", rep("AA", 20)), "Setting BMF with bad characters gives NAs")
 }
 
 test_describing <- function() {
