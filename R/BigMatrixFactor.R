@@ -33,7 +33,7 @@ BigMatrixFactorGenerator$lock("levels")
 ##' Create a new BigMatrixFactor
 ##'
 ##' Create a new BigMatrixFactor
-##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix. A scalar numeric can be used to initalize the whole matrix. NULL gives the bigmemory feature of initializing to all zeros instantly.
+##' @param x scalar or matrix to be treated as character.
 ##' @param backingfile character, full path to the file that will contain the data matrix
 ##' @param nrow integer, number of rows in the matrix we are about to create
 ##' @param ncol integer, number of columns in the matrix we are about to create
@@ -42,26 +42,23 @@ BigMatrixFactorGenerator$lock("levels")
 ##' @return BigMatrixFactor
 ##' @examples
 ##' dnames = dimnames=list(letters[1:3],LETTERS[1:3])
-##' x = matrix( sample( 1:3, 9, replace=TRUE), ncol=3, dimnames=dnames)
-##' ds = BigMatrixFactor(x,tempfile(),levels=c("AA","AB","BB"))
-##' ds = BigMatrixFactor(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames,levels=c("AA","AB","BB"))
+##' levels=c("AA","AB","BB")
+##' x = matrix( sample( levels, 9, replace=TRUE), ncol=3, dimnames=dnames)
+##' ds = BigMatrixFactor(x,tempfile(),levels=levels)
+##' ds = BigMatrixFactor(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames,levels=levels)
 ##' @export
-BigMatrixFactor <- function(x=NA_integer_,backingfile,nrow,ncol,dimnames=NULL,levels) {
+BigMatrixFactor <- function(x=NA_character_,backingfile,nrow,ncol,dimnames=NULL,levels) {
+  if (! (is.matrix(x) || length(x) == 1) ) { stop("Initial value for BigMatrixFactor must be a matrix or of length 1.") }
+  if (missing(levels) && is.character(x)) { levels = sort(unique(as.vector(x))) }
   if ( length(levels) > 127 ) {
     type = "integer"
   } else {
     type = "char"
   }
-  if (!is.null(x) && length(x) == 1) {
-    if (is.character(x)) {
-      if (x %in% levels) {
-        x = match(x,levels)
-      }
-    }
-    if (! x %in% c(NA_integer_, seq.int(1L, length(levels)))) {
-      stop("Initial value for a BigMatrixFactor must be an existing big.matrix, NA, NULL, or an integer in the range 1:length(levels).")
-    }
-  }
+  att.list = attributes(x)
+  if (!is.character(x)) { x = as.character(x) }
+  x = match(x, levels)
+  attributes(x) = att.list
   bm = .initBigMatrix(x=x,class="BigMatrixFactor",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, levels=levels, type=type)
   return( bm )
 }

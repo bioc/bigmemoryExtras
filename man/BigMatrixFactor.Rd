@@ -2,15 +2,11 @@
 \alias{BigMatrixFactor}
 \title{Create a new BigMatrixFactor}
 \usage{
-  BigMatrixFactor(x = NA_integer_, backingfile, nrow, ncol,
-    dimnames = NULL, levels)
+  BigMatrixFactor(x = NA_character_, backingfile, nrow,
+    ncol, dimnames = NULL, levels)
 }
 \arguments{
-  \item{x}{scalar numeric, NULL, matrix, or big.matrix.
-  Optional data or big.matrix for new BigMatrix. A scalar
-  numeric can be used to initalize the whole matrix. NULL
-  gives the bigmemory feature of initializing to all zeros
-  instantly.}
+  \item{x}{scalar or matrix to be treated as character.}
 
   \item{backingfile}{character, full path to the file that
   will contain the data matrix}
@@ -34,8 +30,9 @@
 }
 \examples{
 dnames = dimnames=list(letters[1:3],LETTERS[1:3])
-x = matrix( sample( 1:3, 9, replace=TRUE), ncol=3, dimnames=dnames)
-ds = BigMatrixFactor(x,tempfile(),levels=c("AA","AB","BB"))
-ds = BigMatrixFactor(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames,levels=c("AA","AB","BB"))
+levels=c("AA","AB","BB")
+x = matrix( sample( levels, 9, replace=TRUE), ncol=3, dimnames=dnames)
+ds = BigMatrixFactor(x,tempfile(),levels=levels)
+ds = BigMatrixFactor(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames,levels=levels)
 }
 

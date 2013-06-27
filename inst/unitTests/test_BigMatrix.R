@@ -1,56 +1,55 @@
 rownames = letters[1:3]
 colnames = LETTERS[1:3]
 mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
-int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
-char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
-levels = c("AA","BB")
-char.mat = matrix()
   
 back.dir = tempdir()
 ds.data.file = file.path(back.dir,"bigmat","ds")
 ds.data.file = normalizePath(ds.data.file)
 ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+
 fs.data.file = file.path(back.dir,"bigmat","fs")
-fs = BigMatrixFactor(int.mat,fs.data.file,3,3,list(rownames,colnames),levels=levels)
+char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
+int.mat = matrix(c(rep(1,5),rep(2,4)),ncol=3,dimnames=list(rownames,colnames))
+levels = c("AA","BB")
+fs = BigMatrixFactor(char.mat, backingfile=fs.data.file,nrow=3,ncol=3,dimnames=list(rownames,colnames),levels=levels)
 
 test_creation <- function() {
   back.dir = tempdir()
   
   ds = BigMatrix(mat,tempfile())
-  fs = BigMatrixFactor(int.mat,tempfile(),levels=levels)
   checkTrue(validObject(ds))
-  checkTrue(validObject(fs))
   checkEquals(ds[,],mat)
-  checkEquals(as(fs[,],"matrix"),int.mat)
+
   
   ds = BigMatrix(ds$bigmat,tempfile())
-  fs = BigMatrixFactor(fs$bigmat,tempfile(),levels=levels)
   checkTrue(validObject(ds))
-  checkTrue(validObject(fs))
   checkEquals(ds[,],mat)
-  checkEquals(as(fs[,],"matrix"),int.mat)
 
   ds = BigMatrix(x=NULL,tempfile(),3,3,list(rownames,colnames))
   ds[,] = mat
-  fs = BigMatrixFactor(x="AA",tempfile(),3,3,list(rownames,colnames),levels=levels)
-  fs[,3] = "BB"
   checkTrue(validObject( ds ))
   checkEquals(ds[,],mat)
-  checkTrue(validObject( fs ))
-  checkEquals(as(fs[,],"matrix"),int.mat)
+
   checkException( BigMatrix(x=1:4, tempfile()), "x must be NULL, scalar numeric, matrix, or bigmatrix.", silent=TRUE)
   checkEquals( BigMatrix(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12, "BigMatrix creation with a scalar init value.")
   na_bm = BigMatrix(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
-  na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
   checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
-  checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
 
-  checkException( BigMatrixFactor(7, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4]), "Scalar init value for BigMatrixFactor should not be > length(levels)", silent=TRUE)
-  checkException( BigMatrixFactor(0, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4]), "Scalar init value for BigMatrixFactor should not be > length(levels)", silent=TRUE)
-  checkException( BigMatrixFactor("X", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4]), "Scalar character init value for BigMatrixFactor should be in levels", silent=TRUE)
-  checkTrue( all(as.integer(BigMatrixFactor(3L, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ]) == 3L), "Scalar init value for BigMatrixFactor should be in 1:length(levels)")
-  checkTrue( all(as.integer(BigMatrixFactor(3, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ]) == 3L), "Scalar init value for BigMatrixFactor should be in 1:length(levels), double OK")
+  fs = BigMatrixFactor(char.mat, backingfile=tempfile(), levels=levels)
+  checkTrue(validObject(fs))
+  checkEquals(as(fs[,],"matrix"), int.mat, "Initialize with char mat, gets right ints")
+  checkEquals(as.character(fs[, ]), as.character(char.mat), "Initialize with char mat, gets right chars")
+
+  na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
+  checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
   checkTrue( all(BigMatrixFactor("B", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ] == "B"), "Scalar character init value in levels is OK.")
+  checkTrue( all(is.na( BigMatrixFactor("X", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
+  checkTrue( all(is.na( BigMatrixFactor(1, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
+  checkTrue( all(is.na( BigMatrixFactor(matrix(1:9,ncol=3), backingfile=tempfile(), levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
+  bad.char.mat = matrix( c('a', 3, 'b', 'e'), ncol=2)
+  expected.bad.char.mat = matrix( c('a', 3, 'b', NA), ncol=2)
+  checkIdentical( as.character(expected.bad.char.mat), as.character(BigMatrixFactor(bad.char.mat, backingfile=tempfile(), levels=c('a', '3', 'b', 'c'))[, ]), "Bad values in init mat become NA")
+  checkIdentical( c("AA", "BB"), levels(BigMatrixFactor(char.mat, backingfile=tempfile())), "Levels set from character if missing")
 }
 
 test_coercion <- function() {
