@@ -323,7 +323,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' Create a new BigMatrix
 ##'
 ##' Create a new BigMatrix
-##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix. A scalar numeric can be used to initalize the whole matrix.
+##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix. A scalar numeric can be used to initalize the whole matrix. NULL gives the bigmemory feature of initializing to all zeros instantly.
 ##' @param backingfile character, full path to the file that will contain the data matrix
 ##' @param nrow integer, number of rows in the matrix we are about to create
 ##' @param ncol integer, number of columns in the matrix we are about to create
@@ -336,7 +336,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' ds = BigMatrix(x,tempfile())
 ##' ds = BigMatrix(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames)
 ##' @export
-BigMatrix <- function(x=NULL,backingfile,nrow,ncol,dimnames,type="double") {
+BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames,type="double") {
   bm = .initBigMatrix(x=x, class="BigMatrix",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, type=type)
   return( bm )
 }

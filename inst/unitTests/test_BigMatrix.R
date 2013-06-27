@@ -39,6 +39,10 @@ test_creation <- function() {
   checkEquals(as(fs[,],"matrix"),int.mat)
   checkException( BigMatrix(x=1:4, tempfile()), "x must be NULL, scalar numeric, matrix, or bigmatrix.", silent=TRUE)
   checkEquals( BigMatrix(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12, "BigMatrix creation with a scalar init value.")
+  na_bm = BigMatrix(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
+  na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
+  checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
+  checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
 }
 
 test_coercion <- function() {

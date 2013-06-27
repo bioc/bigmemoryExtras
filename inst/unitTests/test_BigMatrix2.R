@@ -26,6 +26,8 @@ test_creation <- function() {
   checkEquals(ds[,],mat)
   checkException( BigMatrix2(x=1:4, tempfile()), "x must be NULL, scalar numeric, matrix, or bigmatrix.", silent=TRUE)
   checkEquals( BigMatrix2(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12, "BigMatrix2 creation with a scalar init value.")
+  na_bm = BigMatrix2(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
+  checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
 }
 
 test_coercion <- function() {
