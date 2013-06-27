@@ -2,6 +2,7 @@ rownames = letters[1:3]
 colnames = LETTERS[1:3]
 mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
 int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
+char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
 levels = c("AA","BB")
 char.mat = matrix()
   
@@ -31,8 +32,8 @@ test_creation <- function() {
 
   ds = BigMatrix(x=NULL,tempfile(),3,3,list(rownames,colnames))
   ds[,] = mat
-  fs = BigMatrixFactor(x=NULL,tempfile(),3,3,list(rownames,colnames),levels=levels)
-  fs[,] = int.mat
+  fs = BigMatrixFactor(x="AA",tempfile(),3,3,list(rownames,colnames),levels=levels)
+  fs[,3] = "BB"
   checkTrue(validObject( ds ))
   checkEquals(ds[,],mat)
   checkTrue(validObject( fs ))
@@ -91,20 +92,21 @@ test_write <- function() {
   checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
   Sys.chmod(ds$datapath,"0644")
   ds$attach(force=TRUE)
-  fs[,] = int.mat
-  fs[,1] = 1:3
-  returned.factor = factor(structure(c("AA","BB",NA),names=letters[1:3]),levels=levels)
-  checkEquals(fs[,1], returned.factor, "Setting BigMatrixFactor with integers")
+
   fs[,1] = c("BB",NA,"AA")
   returned.factor = factor(structure(c("BB",NA,"AA"),names=letters[1:3]),levels=levels)
   checkIdentical(fs[,1], returned.factor, "Setting BigMatrixFactor with characters")
 
   fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
-  fs[, 1] = c(-1, 0, 1, 2, 4)
-  checkIdentical( as.character(fs[, ]), c(NA, NA, "AA", "BB", NA, rep("AA", 20)), "Setting BMF with bad integers gives NAs")
   fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
   fs[, 1] = c("AA", "SHOE", "GOO", "AA", "BB")
   checkIdentical( as.character(fs[, ]), c("AA", NA, NA, "AA", "BB", rep("AA", 20)), "Setting BMF with bad characters gives NAs")
+
+  fs2 = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, levels=c('A', '9', 'B', '12'))
+  fs2[, ] = "A"
+  fs2[2,2] = 9
+  fs2[3,3] = 1
+  checkIdentical( c(rep("A", 4), "9", rep("A", 3), NA_character_), as.character(fs2[, ]))
 }
 
 test_describing <- function() {
@@ -117,17 +119,17 @@ test_describing <- function() {
   checkEquals(length(ds),length(mat))
   checkIdentical(dimnames(ds),dimnames(mat))
   # Setting
-  new.dimnames = list(letters[4:6], LETTERS[4:6])
-  dimnames(ds) = new.dimnames
-  checkIdentical(dimnames(ds), new.dimnames)
-  
-  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
-  colnames(ds) = new.dimnames[[2]]
-  checkIdentical(colnames(ds), new.dimnames[[2]])
-
-  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
-  rownames(ds) = new.dimnames[[1]]
-  checkIdentical(rownames(ds), new.dimnames[[1]])
+#  new.dimnames = list(letters[4:6], LETTERS[4:6])
+#  dimnames(ds) = new.dimnames
+#  checkIdentical(dimnames(ds), new.dimnames)
+#  
+#  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+#  colnames(ds) = new.dimnames[[2]]
+#  checkIdentical(colnames(ds), new.dimnames[[2]])
+#
+#  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+#  rownames(ds) = new.dimnames[[1]]
+#  checkIdentical(rownames(ds), new.dimnames[[1]])
 }
 
 test_reattach <- function() {

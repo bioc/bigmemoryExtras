@@ -15,11 +15,8 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                    return(mat)
                                  },
                                  setValues=function(i,j,value) {
-                                   if (is.character(value)) {
-                                     value = match(value,.self$levels)
-                                   } else {
-                                     value = ifelse( value >= 1L, ifelse(value <= .self$nlevels(), value, NA_integer_), NA_integer_)
-                                   }
+                                   if (!is.character(value)) { value = as.character(value) }
+                                   value = match(value,.self$levels)
                                    callSuper(i,j,value)
                                  },
                                  nlevels=function() {
