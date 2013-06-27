@@ -336,7 +336,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' ds = BigMatrix(x,tempfile())
 ##' ds = BigMatrix(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames)
 ##' @export
-BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames,type="double") {
+BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="double") {
   bm = .initBigMatrix(x=x, class="BigMatrix",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, type=type)
   return( bm )
 }

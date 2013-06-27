@@ -2,13 +2,15 @@
 \alias{BigMatrix2}
 \title{Create a new BigMatrix2}
 \usage{
-  BigMatrix2(x = NULL, backingfile, nrow, ncol,
+  BigMatrix2(x = NA_real_, backingfile, nrow, ncol,
     dimnames = NULL, type = "double")
 }
 \arguments{
   \item{x}{scalar numeric, NULL, matrix, or big.matrix.
   Optional data or big.matrix for new BigMatrix2. A scalar
-  numeric can be used to initalize the whole matrix.}
+  numeric can be used to initalize the whole matrix. NULL
+  gives the bigmemory feature of initializing to all zeros
+  instantly.}
 
   \item{backingfile}{character, full path to the file that
   will contain the data matrix}

@@ -2,13 +2,15 @@
 \alias{BigMatrixFactor}
 \title{Create a new BigMatrixFactor}
 \usage{
-  BigMatrixFactor(x = NULL, backingfile, nrow, ncol,
-    dimnames, levels)
+  BigMatrixFactor(x = NA_integer_, backingfile, nrow, ncol,
+    dimnames = NULL, levels)
 }
 \arguments{
   \item{x}{scalar numeric, NULL, matrix, or big.matrix.
   Optional data or big.matrix for new BigMatrix. A scalar
-  numeric can be used to initalize the whole matrix.}
+  numeric can be used to initalize the whole matrix. NULL
+  gives the bigmemory feature of initializing to all zeros
+  instantly.}
 
   \item{backingfile}{character, full path to the file that
   will contain the data matrix}

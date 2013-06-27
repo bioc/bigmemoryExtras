@@ -43,6 +43,13 @@ test_creation <- function() {
   na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
   checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
   checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
+
+  checkException( BigMatrixFactor(7, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4]), "Scalar init value for BigMatrixFactor should not be > length(levels)", silent=TRUE)
+  checkException( BigMatrixFactor(0, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4]), "Scalar init value for BigMatrixFactor should not be > length(levels)", silent=TRUE)
+  checkException( BigMatrixFactor("X", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4]), "Scalar character init value for BigMatrixFactor should be in levels", silent=TRUE)
+  checkTrue( all(as.integer(BigMatrixFactor(3L, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ]) == 3L), "Scalar init value for BigMatrixFactor should be in 1:length(levels)")
+  checkTrue( all(as.integer(BigMatrixFactor(3, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ]) == 3L), "Scalar init value for BigMatrixFactor should be in 1:length(levels), double OK")
+  checkTrue( all(BigMatrixFactor("B", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ] == "B"), "Scalar character init value in levels is OK.")
 }
 
 test_coercion <- function() {

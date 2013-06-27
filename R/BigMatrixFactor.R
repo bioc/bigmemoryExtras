@@ -47,11 +47,21 @@ BigMatrixFactorGenerator$lock("levels")
 ##' ds = BigMatrixFactor(x,tempfile(),levels=c("AA","AB","BB"))
 ##' ds = BigMatrixFactor(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames,levels=c("AA","AB","BB"))
 ##' @export
-BigMatrixFactor <- function(x=NA_integer_,backingfile,nrow,ncol,dimnames,levels) {
+BigMatrixFactor <- function(x=NA_integer_,backingfile,nrow,ncol,dimnames=NULL,levels) {
   if ( length(levels) > 127 ) {
     type = "integer"
   } else {
     type = "char"
+  }
+  if (!is.null(x) && length(x) == 1) {
+    if (is.character(x)) {
+      if (x %in% levels) {
+        x = match(x,levels)
+      }
+    }
+    if (! x %in% c(NA_integer_, seq.int(1L, length(levels)))) {
+      stop("Initial value for a BigMatrixFactor must be an existing big.matrix, NA, NULL, or an integer in the range 1:length(levels).")
+    }
   }
   bm = .initBigMatrix(x=x,class="BigMatrixFactor",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, levels=levels, type=type)
   return( bm )
