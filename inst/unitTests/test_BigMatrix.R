@@ -7,12 +7,6 @@ ds.data.file = file.path(back.dir,"bigmat","ds")
 ds.data.file = normalizePath(ds.data.file)
 ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 
-fs.data.file = file.path(back.dir,"bigmat","fs")
-char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
-int.mat = matrix(c(rep(1,5),rep(2,4)),ncol=3,dimnames=list(rownames,colnames))
-levels = c("AA","BB")
-fs = BigMatrixFactor(char.mat, backingfile=fs.data.file,nrow=3,ncol=3,dimnames=list(rownames,colnames),levels=levels)
-
 test_creation <- function() {
   back.dir = tempdir()
   
@@ -35,29 +29,11 @@ test_creation <- function() {
   na_bm = BigMatrix(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
   checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
 
-  fs = BigMatrixFactor(char.mat, backingfile=tempfile(), levels=levels)
-  checkTrue(validObject(fs))
-  checkEquals(as(fs[,],"matrix"), int.mat, "Initialize with char mat, gets right ints")
-  checkEquals(as.character(fs[, ]), as.character(char.mat), "Initialize with char mat, gets right chars")
-
-  na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
-  checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
-  checkTrue( all(BigMatrixFactor("B", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ] == "B"), "Scalar character init value in levels is OK.")
-  checkTrue( all(is.na( BigMatrixFactor("X", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
-  checkTrue( all(is.na( BigMatrixFactor(1, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
-  checkTrue( all(is.na( BigMatrixFactor(matrix(1:9,ncol=3), backingfile=tempfile(), levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
-  bad.char.mat = matrix( c('a', 3, 'b', 'e'), ncol=2)
-  expected.bad.char.mat = matrix( c('a', 3, 'b', NA), ncol=2)
-  checkIdentical( as.character(expected.bad.char.mat), as.character(BigMatrixFactor(bad.char.mat, backingfile=tempfile(), levels=c('a', '3', 'b', 'c'))[, ]), "Bad values in init mat become NA")
-  checkIdentical( c("AA", "BB"), levels(BigMatrixFactor(char.mat, backingfile=tempfile())), "Levels set from character if missing")
 }
 
 test_coercion <- function() {
   checkEquals( ds[,], as(ds,"matrix") )
   checkEquals( ds[,], as.matrix(ds) )
-  checkEquals( as(fs[,],"matrix"), as(fs,"matrix") )
-  checkEquals( fs[,], as(fs,"factor") )
-  checkEquals( fs[,], as.matrix(fs) )
 }
 
 test_subset <- function() {
@@ -70,11 +46,6 @@ test_subset <- function() {
   ds["b","B"] = 3
   mat["b","B"] = 3
   checkIdentical( ds[,], mat,"After re-setting some values" )
-  char.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=dimnames(fs))
-  char.mat = structure(char.mat, levels=levels(fs), class="factor")
-  checkIdentical( fs[,], char.mat )
-  checkIdentical( fs[,1], char.mat[,1] )
-  checkIdentical( fs[2,], char.mat[2,] )
 }
 
 test_write <- function() {
@@ -91,21 +62,6 @@ test_write <- function() {
   checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
   Sys.chmod(ds$datapath,"0644")
   ds$attach(force=TRUE)
-
-  fs[,1] = c("BB",NA,"AA")
-  returned.factor = factor(structure(c("BB",NA,"AA"),names=letters[1:3]),levels=levels)
-  checkIdentical(fs[,1], returned.factor, "Setting BigMatrixFactor with characters")
-
-  fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
-  fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
-  fs[, 1] = c("AA", "SHOE", "GOO", "AA", "BB")
-  checkIdentical( as.character(fs[, ]), c("AA", NA, NA, "AA", "BB", rep("AA", 20)), "Setting BMF with bad characters gives NAs")
-
-  fs2 = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, levels=c('A', '9', 'B', '12'))
-  fs2[, ] = "A"
-  fs2[2,2] = 9
-  fs2[3,3] = 1
-  checkIdentical( c(rep("A", 4), "9", rep("A", 3), NA_character_), as.character(fs2[, ]))
 }
 
 test_describing <- function() {
@@ -155,17 +111,6 @@ test_reattach <- function() {
   checkException(old.ds$attach(force=TRUE),silent=TRUE,"Missing descriptor file")
 }
 
-test_levels <- function() {
-  checkIdentical( levels(fs), c("AA","BB") )
-  checkIdentical( fs$levels, c("AA","BB") )
-  checkException( fs$levels <- c("AB","QQ"), silent=TRUE )
-  checkException( levels(fs) <- c("AB","QQ"), silent=TRUE )
-}
-
-test_nlevels <- function() {
-  checkEquals( nlevels(fs), 2L )
-}
-
 test_paths <- function() {
   desc.file = paste(ds.data.file,"desc.rds",sep=".")
   checkEquals(normalizePath(ds$datapath),ds.data.file)
@@ -184,4 +129,3 @@ test_paths <- function() {
 test_apply <- function() {
   checkEquals( apply( ds, 1, mean ), apply( mat, 1, mean ), "apply on BigMatrix just like apply on base matrix" )
 }
-
