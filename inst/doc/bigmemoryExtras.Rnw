@@ -106,31 +106,18 @@ ds$length()
 The bigmemoryExtras package adds a ``BigMatrixFactor'' class to provide a
 means to store large matrices of characters. On the file system, these
 are stored as the C type char or int (8 or 32 bits), depending on the number of
-levels in the factor. Subsetting a BigMatrixFactor returns a base
-matrix that is also a factor. This provides a convenient way to
-convert between integer and character representations of the data.
+levels in the factor. Subsetting a BigMatrixFactor returns a character matrix. Previous versions 
+returned factor with a \code{dim} attribute that made it a matrix too. This made it a bit difficult to know how S3 
+methods would behave and was a big confusing for folks, so not it is just a regular character matrix.
 
 <<factorcode>>=
 data.file = file.path(tempdir(),"bigmat","fs")
-x = matrix( c(rep(1,5),rep(2,4)) ,ncol=3,dimnames=list(letters[1:3],LETTERS[1:3]))
+x = matrix( c(rep("AA",5),rep("BB",4)) ,ncol=3,dimnames=list(letters[1:3],LETTERS[1:3]))
 fs = BigMatrixFactor(x,data.file,levels=c("AA","BB"))
 fs[,]
-as(fs,"factor")
 as(fs,"matrix")
 fs$levels
 levels(fs)
-@ 
-
-However, you may want to set the S3 class of this matrix/factor to
-'matrix' in some cases, like when you need to maintain its shape.
-<<factortricks>>=
-x = as(fs,"factor")
-x
-x == "BB"
-y = as(fs,"matrix")
-y
-y == 2
-rowMeans( y == 2 )
 @ 
 
 \section{Use with Biobase and eSet-derived Classes}

@@ -1,9 +1,10 @@
 rownames = letters[1:3]
 colnames = LETTERS[1:3]
+back.dir = tempdir()
 
 fs.data.file = file.path(back.dir,"bigmat","fs")
 char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
-int.mat = matrix(c(rep(1,5),rep(2,4)),ncol=3,dimnames=list(rownames,colnames))
+int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
 levels = c("AA","BB")
 fs = BigMatrixFactor(char.mat, backingfile=fs.data.file,nrow=3,ncol=3,dimnames=list(rownames,colnames),levels=levels)
 
@@ -12,8 +13,7 @@ test_creation <- function() {
   
   fs = BigMatrixFactor(char.mat, backingfile=tempfile(), levels=levels)
   checkTrue(validObject(fs))
-  checkEquals(as(fs[,],"matrix"), int.mat, "Initialize with char mat, gets right ints")
-  checkEquals(as.character(fs[, ]), as.character(char.mat), "Initialize with char mat, gets right chars")
+  checkEquals(fs[, ], char.mat, "Initialize with char mat, gets right chars")
 
   na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
   checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
@@ -28,33 +28,32 @@ test_creation <- function() {
 }
 
 test_coercion <- function() {
-  checkEquals( fs[,], as(fs,"factor") )
   checkEquals( fs[,], as.matrix(fs) )
 }
 
 test_subset <- function() {
-  char.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=dimnames(fs))
-  char.mat = structure(char.mat, levels=levels(fs), class="factor")
+  char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
   checkIdentical( fs[,], char.mat )
   checkIdentical( fs[,1], char.mat[,1] )
   checkIdentical( fs[2,], char.mat[2,] )
 }
 
 test_write <- function() {
-  fs[,1] = c("BB",NA,"AA")
-  returned.factor = factor(structure(c("BB",NA,"AA"),names=letters[1:3]),levels=levels)
-  checkIdentical(fs[,1], returned.factor, "Setting BigMatrixFactor with characters")
+  onecol = structure(c("BB",NA,"AA"), names=rownames)
+  fs[,1] = onecol
+  checkIdentical(fs[,1], onecol, "Setting BigMatrixFactor with characters")
 
   fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
-  fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
   fs[, 1] = c("AA", "SHOE", "GOO", "AA", "BB")
-  checkIdentical( as.character(fs[, ]), c("AA", NA, NA, "AA", "BB", rep("AA", 20)), "Setting BMF with bad characters gives NAs")
+  retmat = matrix(c("AA", NA, NA, "AA", "BB", rep("AA", 20)), ncol=ncol(fs))
+  checkIdentical( fs[, ], retmat, "Setting BMF with bad characters gives NAs")
 
   fs2 = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, levels=c('A', '9', 'B', '12'))
   fs2[, ] = "A"
   fs2[2,2] = 9
   fs2[3,3] = 1
-  checkIdentical( c(rep("A", 4), "9", rep("A", 3), NA_character_), as.character(fs2[, ]))
+  retmat2 = matrix( c(rep("A", 4), "9", rep("A", 3), NA_character_),  ncol=3)
+  checkIdentical( retmat2, fs2[, ])
 }
 
 test_levels <- function() {

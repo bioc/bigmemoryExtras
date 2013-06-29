@@ -14,3 +14,7 @@ Version 1.4.0: Changed internal representation to optimize handling of dimnames 
 
 # Wed 06-26-2013 - 19:56
 Version 1.4.1: Better defaults for initial value of BigMatrix and BigMatrixFactor (NA_real_ and NA_integer_).  Giving x=NULL still provides the bigmemory feature of initializing to all zeros instantly.
+
+
+# Fri 06-28-2013 - 16:54
+Version 1.4.2: BigMatrixFactor subsetting now just returns a character matrix. The previous factor with dim == 2 was a bit unpredictable and confusing for folks.

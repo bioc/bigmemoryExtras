@@ -9,11 +9,13 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                  levels="character"
                                  ),
                                methods=list(
-                                 getValues=function(i,j,drop=TRUE) {
-                                   mat = callSuper(i,j,drop=drop)
-                                   mat = structure(mat, levels=.self$levels, class="factor")
+                                 getValues=function(i, j, drop=TRUE) {
+                                   mat = callSuper(i, j, drop=TRUE)
+                                   att.list = attributes(mat)
+                                   mat = .self$levels[ mat ]
+                                   attributes(mat) = att.list # This is the second time we set dimnames, so that could be improved.
                                    return(mat)
-                                 },
+                                 }, 
                                  setValues=function(i,j,value) {
                                    if (!is.character(value)) { value = as.character(value) }
                                    value = match(value,.self$levels)
@@ -83,5 +85,4 @@ setMethod("nlevels",signature=signature(x="BigMatrixFactor"),
             return(x$nlevels())
           })
 
-setAs("BigMatrixFactor","matrix", function(from) { return(from$bigmat[,]) })
-setAs("BigMatrixFactor","factor", function(from) { return(from[,]) })
+setAs("BigMatrixFactor","matrix", function(from) { return(fs[, ]) })
