@@ -25,8 +25,6 @@
 ##' @seealso BigMatrix-class BigMatrixFactor-class BigMatrix BigMatrixFactor filebacked.big.matrix ReferenceClasses
 ##' @import methods
 ##' @import bigmemory
-##' @importClassesFrom Biobase AnnotatedDataFrame AssayData
-##' @importFrom Biobase annotatedDataFrameFrom assayDataElementNames assayDataElement
 ##' @importFrom BiocGenerics updateObject
 ##' @importFrom biganalytics apply
 NULL

@@ -85,4 +85,4 @@ setMethod("nlevels",signature=signature(x="BigMatrixFactor"),
             return(x$nlevels())
           })
 
-setAs("BigMatrixFactor","matrix", function(from) { return(fs[, ]) })
+setAs("BigMatrixFactor","matrix", function(from) { return(from[, ]) })

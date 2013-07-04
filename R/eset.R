@@ -22,7 +22,10 @@
 ##' original eSet only necessary if using a list type assayData, which is rare.
 ##' @export 
 attachAssayDataElements <- function(aData) {
-  for( ad.name in assayDataElementNames(aData)) {
+  if (!requireNamespace("Biobase",quietly=TRUE)) {
+    stop("Failed to require Biobase package.\n")
+  }
+  for( ad.name in Biobase:::assayDataElementNames(aData)) {
     if ( is( aData[[ad.name]], "BigMatrix" ) ) {
       aData[[ad.name]]$attach()
     }
@@ -45,15 +48,17 @@ attachAssayDataElements <- function(aData) {
 ##' @export 
 ##' @author Peter M. Haverty \email{phaverty@@gene.com}
 updateAssayDataElementPaths <- function(ds, dir) {
-  for (ad.name in assayDataElementNames(ds)) {
-    if (is(assayDataElement(ds,ad.name),"BigMatrix")) {
-      ad = assayDataElement(ds,ad.name)
-      ad$descpath = file.path( dir, basename(assayDataElement(ds,ad.name)$descpath))
+  if (!requireNamespace("Biobase",quietly=TRUE)) {
+    stop("Failed to require Biobase package.\n")
+  }
+  for (ad.name in Biobase:::assayDataElementNames(ds)) {
+    if (is(Biobase:::assayDataElement(ds,ad.name),"BigMatrix")) {
+      ad = Biobase:::assayDataElement(ds,ad.name)
+      ad$descpath = file.path( dir, basename(Biobase:::assayDataElement(ds,ad.name)$descpath))
     }
   }
   return(invisible(ds))
 }
-
 
 ##' Use BigMatrix in eSet assayData
 ##'
@@ -62,7 +67,13 @@ updateAssayDataElementPaths <- function(ds, dir) {
 ##' create an annotatedDataFrame from that class.  Users are unlikely to ever call this
 ##' method.
 ##'
-##' @exportMethod annotatedDataFrameFrom
+##' @export annotatedDataFrameFrom
+##' @rdname annotatedDataFrameFrom.Rd
+setGeneric("annotatedDataFrameFrom", function(object, byrow, ...) standardGeneric("annotatedDataFrameFrom"))
 setMethod("annotatedDataFrameFrom",
-          signature(object="BigMatrix"),
-          Biobase:::annotatedDataFrameFromMatrix)
+          signature(object="BigMatrix"), function(object, byrow, ...) {
+            if (!requireNamespace("Biobase",quietly=TRUE)) {
+              stop("Failed to require Biobase package.\n")
+            }
+          Biobase:::annotatedDataFrameFromMatrix(object)
+          })
