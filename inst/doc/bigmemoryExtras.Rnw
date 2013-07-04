@@ -107,7 +107,7 @@ The bigmemoryExtras package adds a ``BigMatrixFactor'' class to provide a
 means to store large matrices of characters. On the file system, these
 are stored as the C type char or int (8 or 32 bits), depending on the number of
 levels in the factor. Subsetting a BigMatrixFactor returns a character matrix. Previous versions 
-returned factor with a \code{dim} attribute that made it a matrix too. This made it a bit difficult to know how S3 
+returned factor with a dim attribute that made it a matrix too. This made it a bit difficult to know how S3 
 methods would behave and was a big confusing for folks, so not it is just a regular character matrix.
 
 <<factorcode>>=
