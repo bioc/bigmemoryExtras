@@ -11,6 +11,7 @@ data.file = file.path(back.dir,"bigmat","ds.eset")
 ds.eset = BigMatrix(mat,data.file,3,3,list(rownames,colnames))
 
 test_use_in_eset <- function() {
+  eset = ExpressionSet()
   assayDataElement(eset,"exprs") = ds.eset
   checkEquals( exprs(eset)[,1], ds.eset[,1], "Subset should give back column" )
 }
