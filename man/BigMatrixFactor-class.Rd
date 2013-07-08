@@ -27,8 +27,6 @@ All reference classes extend and inherit methods from \code{"\linkS4class{envRef
   \describe{
     S4-style methods supplement ReferenceClass methods to provide a
     standard factor API.
-    \item{coerce}{\code{signature(from = "BigMatrixFactor", to = "factor")}: ... }
-    \item{coerce}{\code{signature(from = "BigMatrixFactor", to = "matrix")}: ... }
     \item{nlevels}{\code{signature(x = "BigMatrixFactor")}: Query the number of levels, as in a typical factor. }
     \item{levels}{\code{signature(x = "BigMatrixFactor")}: Access the levels, as in a typical factor. }
     \item{levels<-}{\code{signature(x = "BigMatrixFactor")}: Set the levels, as in a typical factor. Disallowed for now. }
@@ -48,8 +46,6 @@ x = matrix( sample( 1:3, 9, replace=TRUE), ncol=3, dimnames=list(letters[1:3],LE
 ds = BigMatrixFactor(x,back.file,levels=c("AA","AB","BB"))
 ds[1,3]
 ds[3,3] = "AB"
-as(ds,"matrix")
-as(ds,"factor")
 ds[,]
 nlevels(ds)
 ds$nlevels()

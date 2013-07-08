@@ -68,7 +68,7 @@ updateAssayDataElementPaths <- function(ds, dir) {
 ##' method.
 ##'
 ##' @export annotatedDataFrameFrom
-##' @rdname annotatedDataFrameFrom.Rd
+##' @rdname annotatedDataFrameFrom
 setGeneric("annotatedDataFrameFrom", function(object, byrow, ...) standardGeneric("annotatedDataFrameFrom"))
 setMethod("annotatedDataFrameFrom",
           signature(object="BigMatrix"), function(object, byrow, ...) {

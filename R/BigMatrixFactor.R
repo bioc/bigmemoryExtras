@@ -1,4 +1,5 @@
 
+
 ##############################
 ###  Class BigMatrixFactor ###
 ##############################
@@ -12,7 +13,11 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                  getValues=function(i, j, drop=TRUE) {
                                    mat = callSuper(i, j, drop=TRUE)
                                    att.list = attributes(mat)
-                                   mat = .self$levels[ mat ]
+                                   if (is.matrix(mat)) {
+                                     att.list = c(att.list, list(class=c("matrix", "factor"), levels=.self$levels))
+                                   } else {
+                                     att.list = c(att.list, list(class=c("factor"), levels=.self$levels))
+                                   }
                                    attributes(mat) = att.list # This is the second time we set dimnames, so that could be improved.
                                    return(mat)
                                  }, 

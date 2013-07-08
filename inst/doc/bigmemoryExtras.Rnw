@@ -106,9 +106,7 @@ ds$length()
 The bigmemoryExtras package adds a ``BigMatrixFactor'' class to provide a
 means to store large matrices of characters. On the file system, these
 are stored as the C type char or int (8 or 32 bits), depending on the number of
-levels in the factor. Subsetting a BigMatrixFactor returns a character matrix. Previous versions 
-returned factor with a dim attribute that made it a matrix too. This made it a bit difficult to know how S3 
-methods would behave and was a big confusing for folks, so not it is just a regular character matrix.
+levels in the factor. Subsetting a BigMatrixFactor returns a factor. If more than one column is returned, the returned object is a factor matrix.
 
 <<factorcode>>=
 data.file = file.path(tempdir(),"bigmat","fs")
@@ -118,6 +116,8 @@ fs[,]
 as(fs,"matrix")
 fs$levels
 levels(fs)
+fs[, 2]
+fs[, 2:3]
 @ 
 
 \section{Use with Biobase and eSet-derived Classes}
@@ -142,22 +142,5 @@ assayDataElement(eset,"exprs")$descpath
 attachAssayDataElements( eset )
 
 @ 
-
-\section{Optimal Usage}
-Using dimension names can slow down access to a BigMatrix/big.matrix
-object considerably.  Indexing into a big.matrix by dimname is
-considerably slower indexing by integer.  BigMatrix has an
-optimization to reduce this penalty.
-
-Reading from a
-BigMatrix/big.matrix with dimnames is also slower, as transferring
-dimnames from big.matrix's C++ representation to R and adding them to
-the numeric data from the matrix takes some time.  Typically, this
-takes much more time than just reading the numeric data.
-
-Future
-optimizations may remove these penalties without changing the API, but when speed is critical,
-you will want to avoid indexing by character values and you may want
-to avoid having dimnames altogether.
 
 \end{document}
