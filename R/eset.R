@@ -1,4 +1,7 @@
 #####  Functions to use BigMatrix with Biobase's eSet-derived objects
+##' @importFrom Biobase annotatedDataFrameFrom
+NULL
+
 
 ##' Attach on-disk matrices into assayData
 ##'
@@ -67,13 +70,8 @@ updateAssayDataElementPaths <- function(ds, dir) {
 ##' create an annotatedDataFrame from that class.  Users are unlikely to ever call this
 ##' method.
 ##'
-##' @export annotatedDataFrameFrom
+##' @exportMethod annotatedDataFrameFrom
 ##' @rdname annotatedDataFrameFrom
-setGeneric("annotatedDataFrameFrom", function(object, byrow, ...) standardGeneric("annotatedDataFrameFrom"))
 setMethod("annotatedDataFrameFrom",
-          signature(object="BigMatrix"), function(object, byrow, ...) {
-            if (!requireNamespace("Biobase",quietly=TRUE)) {
-              stop("Failed to require Biobase package.\n")
-            }
-          Biobase:::annotatedDataFrameFromMatrix(object)
-          })
+          signature(object="BigMatrix"), Biobase:::annotatedDataFrameFromMatrix
+          )

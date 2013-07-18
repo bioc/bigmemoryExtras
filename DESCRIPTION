@@ -26,10 +26,10 @@ Imports:
     bigmemory,
     biganalytics,
     methods,
-    BiocGenerics
+    BiocGenerics,
+    Biobase
 Suggests:
     RUnit,
-    Biobase,
     BiocGenerics (>= 0.1.0)
 biocViews: Infrastructure, DataRepresentation
 OS_type: unix

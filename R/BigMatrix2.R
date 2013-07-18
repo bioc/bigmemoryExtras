@@ -37,7 +37,7 @@ NULL
 ###  Class BigMatrix ###
 ########################
 setClassUnion("characterOrNull",c("character","NULL"))
-BigMatrix2Generator <- setRefClass("BigMatrix2",
+BigMatrixGenerator <- setRefClass("BigMatrix",
                          fields=list(
                            bigmat=function(value) {
                              if (missing(value)) {
@@ -193,7 +193,7 @@ BigMatrix2Generator <- setRefClass("BigMatrix2",
                            )
                          )
 
-setValidity("BigMatrix2", function(object) {
+setValidity("BigMatrix", function(object) {
   if (!file.exists(object$backingfile)) {
     return("Backingfile does not exist")
   }
@@ -207,65 +207,65 @@ setValidity("BigMatrix2", function(object) {
 ## No logic other than passing to the right R5 method
 
 ##' @exportMethod '['
-setMethod('[', signature(x = "BigMatrix2"),
+setMethod('[', signature(x = "BigMatrix"),
           function(x,i,j,..., drop=TRUE) {
             return(x$getValues(i,j,..., drop=drop))
           })
 
 ##' @exportMethod '[<-'
-setMethod('[<-', signature(x = "BigMatrix2",i="ANY",j="ANY",value="ANY"),
+setMethod('[<-', signature(x = "BigMatrix",i="ANY",j="ANY",value="ANY"),
           function(x,i,j,value) {
             x$setValues(i,j,value)
             return(x)
           })
 
 ##' @exportMethod dimnames
-setMethod('dimnames', signature(x="BigMatrix2"),
+setMethod('dimnames', signature(x="BigMatrix"),
           function(x) {
             return(x$dimnames())
           })
 
 ##' @exportMethod 'dimnames<-'
-setMethod('dimnames<-', signature(x="BigMatrix2",value="ANY"),
+setMethod('dimnames<-', signature(x="BigMatrix",value="ANY"),
           function(x,value) {
             x$dimnames(value)
             return(x)
           })
 
 ##' @exportMethod nrow
-setMethod('nrow', signature(x="BigMatrix2"),
+setMethod('nrow', signature(x="BigMatrix"),
           function(x) {
             return(x$nrow())
           })
 
 ##' @exportMethod ncol
-setMethod('ncol', signature(x="BigMatrix2"),
+setMethod('ncol', signature(x="BigMatrix"),
           function(x) {
             return(x$ncol())
           })
 
 ##' @exportMethod dim
-setMethod('dim', signature(x="BigMatrix2"),
+setMethod('dim', signature(x="BigMatrix"),
           function(x) {
             return(x$dim())
           })
 
 ##' @exportMethod length
-setMethod('length', signature(x="BigMatrix2"),
+setMethod('length', signature(x="BigMatrix"),
           function(x) {
             return(x$length())
           })
 
 ##' @exportMethod as.matrix
-setMethod("as.matrix",signature(x="BigMatrix2"), function(x) { return(x[,]) })
-setAs("BigMatrix2","matrix", function(from) { return(from[,]) })
+setMethod("as.matrix",signature(x="BigMatrix"), function(x) { return(x[,]) })
+setAs("BigMatrix","matrix", function(from) { return(from[,]) })
 
 ##' @exportMethod apply
-setMethod("apply",signature(X="BigMatrix2"), function(X, MARGIN, FUN, ...) { apply(X$bigmat, MARGIN, FUN, ...) })
+setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { apply(X$bigmat, MARGIN, FUN, ...) })
 
-##' Create a new BigMatrix2-derived class
+##' Create a new BigMatrix-derived class
 ##'
-##' Create a new BigMatrix2-derived class
+##' Create a new BigMatrix-derived class
 ##' @param x NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix
 ##' @param class character, class name.  BigMatrix or BigMatrixFactor currently.
 ##' @param backingfile character, full path to the file that will contain the data matrix
@@ -274,10 +274,10 @@ setMethod("apply",signature(X="BigMatrix2"), function(X, MARGIN, FUN, ...) { app
 ##' @param dimnames list, list(rownames,colnames), as for a typical matrix
 ##' @param type character, can be double, integer, or char
 ##' @param ... other args to pass to "new" method of generator object, like levels
-##' @return BigMatrix2
+##' @return BigMatrix
 ##' @keywords internal
-##' @rdname initBigMatrix2
-.initBigMatrix2 = function(x=NULL, class=c("BigMatrix2"), backingfile, nrow, ncol, dimnames=NULL, type="double", ...) {
+##' @rdname initBigMatrix
+.initBigMatrix = function(x=NULL, class=c("BigMatrix"), backingfile, nrow, ncol, dimnames=NULL, type="double", ...) {
   class = match.arg(class)
   backingpath = dirname(backingfile)
   dir.create(backingpath,showWarnings=FALSE,recursive=TRUE)
@@ -315,24 +315,24 @@ setMethod("apply",signature(X="BigMatrix2"), function(X, MARGIN, FUN, ...) { app
   return( bm )
 }
 
-##' Create a new BigMatrix2
+##' Create a new BigMatrix
 ##'
-##' Create a new BigMatrix2
-##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix2. A scalar numeric can be used to initalize the whole matrix. NULL gives the bigmemory feature of initializing to all zeros instantly.
+##' Create a new BigMatrix
+##' @param x scalar numeric, NULL, matrix, or big.matrix. Optional data or big.matrix for new BigMatrix. A scalar numeric can be used to initalize the whole matrix. NULL gives the bigmemory feature of initializing to all zeros instantly.
 ##' @param backingfile character, full path to the file that will contain the data matrix
 ##' @param nrow integer, number of rows in the matrix we are about to create
 ##' @param ncol integer, number of columns in the matrix we are about to create
 ##' @param dimnames list, list(rownames,colnames), as for a typical matrix
 ##' @param type character type of big.matrix (double, integer, char)
-##' @return BigMatrix2
+##' @return BigMatrix
 ##' @examples
 ##' dnames = dimnames=list(letters[1:3],LETTERS[1:3])
 ##' x = matrix(1:9,ncol=3,dimnames=dnames)
-##' ds = BigMatrix2(x,tempfile())
-##' ds = BigMatrix2(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames)
+##' ds = BigMatrix(x,tempfile())
+##' ds = BigMatrix(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames)
 ##' @export
-BigMatrix2 <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="double") {
-  bm = .initBigMatrix2(x=x, class="BigMatrix2",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, type=type)
+BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="double") {
+  bm = .initBigMatrix(x=x, class="BigMatrix",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, type=type)
   return( bm )
 }
 
@@ -353,9 +353,9 @@ setMethod("updateObject", signature=signature(object="BigMatrix"), function(obje
   new.desc = new('big.matrix.descriptor',  description=desc.list)
   bm = attach.resource(new.desc, path=dirname(object$datapath))
   if (class(object) == "BigMatrixFactor") {
-    bigmat = BigMatrix2(x=bm, backingfile=object$datapath, dimnames=dimnames, levels=object$levels)
+    bigmat = BigMatrix(x=bm, backingfile=object$datapath, dimnames=dimnames, levels=object$levels)
   } else {
-    bigmat = BigMatrix2(x=bm, backingfile=object$datapath, dimnames=dimnames)
+    bigmat = BigMatrix(x=bm, backingfile=object$datapath, dimnames=dimnames)
   }
   return(bigmat)
 })
