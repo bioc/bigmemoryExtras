@@ -25,30 +25,18 @@
 ##' @seealso BigMatrix-class BigMatrixFactor-class BigMatrix BigMatrixFactor filebacked.big.matrix ReferenceClasses
 ##' @import methods
 ##' @import bigmemory
+##' @importFrom BiocGenerics updateObject
 ##' @importFrom biganalytics apply
 NULL
 
 ### Modifications to big.matrix object from bigmemory to help with saving to and restoring from disk and to prevent usage of a nil address
-
-# What to do with description?  Currently really slow to attach as reading dimnames from desc file with dget is 10X the time of reading same info with load
-# Option 1: Dimnames and description as fields, use desc file only for checking read permissions.
-#    Would need to overwrite getters and setters: "[", dimnames, object creation would need to put these in their slots too
-# Option 2: Replace description file with a RData file with same content.  Use finalize method to flush dimnames to desc file. Dimnames as field, or let big.matrix keep them?
-#    Dimnames stay with data file +/- sync errors.  Data files useful independent of object. Maybe that is bad as col/row ordering for one element of a GenoSet could change.
-#    Would be simpler overall
-#    Would need save, finalize methods
-#    Who does a better job using dimnames, R or big.matrix? Speed of indexing, etc.
-#    I'll have to read the desc myself, so should I keep it in a field and make use of it?  Remove dimnames from desc for attach to avoid giving them to big.matrix?
-#    Ooh, could use readRDS and saveRDS, like load/save, but for one object.  No need to deal with getting names of stuff from load.
-#    Maybe want third file with rds version of desc so it could still be a useful big.matrix object?
-#    Could save dimnames in finalize, but useful to have many objects pointing to the same big.matrix (SNOW, etc.).  Don't want contention. Don't have locking?
 
 # Initialize can't require args or have side-effects, so can not create on-disk elements with initialize. Have to do "BigMatrix" function (and/or method?) for users to initialize
 
 ########################
 ###  Class BigMatrix ###
 ########################
-
+setClassUnion("characterOrNull",c("character","NULL"))
 BigMatrixGenerator <- setRefClass("BigMatrix",
                          fields=list(
                            bigmat=function(value) {
@@ -65,104 +53,105 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                }
                              }
                            },
-                           datapath=function(value) {
-                             desc = describe(.self$bigmat)
-                             if (missing(value)) {
-                               backingfile = file.path(dirname(.self$descpath),desc@description$filename)
-                               return(backingfile)
-                             } else {
-                               if (!file.exists(value)) {
-                                 stop("Replacement datapath file must exist before setting 'datapath'. We will need to use the file to reattach after replacing datapath.\n")
-                               }
-                               desc@description$filename = basename(value)
-                               saveRDS(desc,file=.self$descpath)
-                               .self$attach(force=TRUE)
-                               validObject(.self)
-                             }
-                           },
-                           descpath="character",
+                           backingfile="character",
+                           .rownames="characterOrNull", 
+                           .colnames="characterOrNull",
+                           description="list",
                            .bm="big.matrix"
                            ),
                          methods=list(
-                           colnames = function(value) {
-                             if (missing(value)) {
-                               return(base::colnames(.self$bigmat))
-                             }
-                             base::colnames(.self$bigmat) = value
-                           },
                            rownames = function(value) {
                              if (missing(value)) {
-                               return(base::rownames(.self$bigmat))
+                               return(.self$.rownames)
+                             } else {
+                               if (base::length(value) != .self$nrow()) { stop("Length of rownames must match the number of rows.") }
+                             .self$.rownames = value
                              }
-                             base::rownames(.self$bigmat) = value
-                           },
+                           }, 
+                           colnames = function(value) {
+                             if (missing(value)) {
+                               return(.self$.colnames)
+                             } else {
+                               if (base::length(value) != .self$ncol()) { stop("Length of colnames must match the number of columns.") }
+                             .self$.colnames = value
+                             }
+                           }, 
                            dimnames = function(value) {
                              if (missing(value)) {
-                               return(base::dimnames(.self$bigmat))
+                               return(list(.self$.rownames, .self$.colnames))
+                             } else {
+                               if (!is.null(value) && base::length(value) != 2) { stop("dimnames must be set with a list of length 2.") }
+                               .self$.rownames = value[[1]]
+                               .self$.colnames = value[[2]]
                              }
-                             base::dimnames(.self$bigmat) = value
                            },
                            dim  = function() {
-                             return(base::dim(.self$bigmat))
+                             return( c( .self$description$nrow, .self$description$ncol ) )
                            },
                            nrow = function() {
-                             return(base::nrow(.self$bigmat))
+                             return(.self$description$nrow)
                            },
                            ncol = function() {
-                             return(base::ncol(.self$bigmat))
+                             return(.self$description$ncol)
                            },
                            length = function() {
-                             return(base::length(.self$bigmat))
+                             return( .self$description$nrow * .self$description$ncol )
                            },
                            attach=function(force=FALSE) {
                              if (force == FALSE && ! is.nil(.self$.bm@address)) {
                                message("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
                              } else {
-                               message("Attaching to on-disk data:", .self$descpath, "...\n")
-                               if ( ! file.exists(.self$descpath) ) {
-                                 stop("Descriptor file ",.self$descpath," does not exist.")
-                               }
-                               if ( file.access(.self$descpath,4) != 0 ) {
-                                 stop("Can not attach to descriptor file without read permissions.")
-                               }
-                               tryCatch( { desc = readRDS(.self$descpath) },
-                                        error = function(e) {  simpleError("Failed to attach big.matrix on disk component.\n") } )
-                               backingfile = file.path(dirname(.self$descpath),desc@description$filename)
+                               message("Attaching to on-disk data:", .self$backingfile, "...\n")
                                if ( ! file.exists(backingfile) ) {
                                  stop("Backing file ",backingfile," does not exist.")
                                }
-                               if ( file.access( backingfile, 4 ) != 0 ) {
-                                 stop("Can not attach to backing file without read permissions on the backing file.")
+                               if ( file.access(.self$backingfile,4) != 0 ) {
+                                 stop("Can not attach to descriptor file without read permissions.")
                                }
                                tryCatch({
-                                 .self$.bm = attach.big.matrix(desc,path=dirname(.self$descpath))
+                                 desc = new('big.matrix.descriptor',  description=.self$description)
+                                 .self$.bm = attach.big.matrix(desc,path=dirname(.self$backingfile))
                                },
-                                        error = function(e) {  simpleError("Failed to attach big.matrix on disk component.\n") } )
+                                        error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
                              }
+                             if ("datapath" %in% ls(.self)) { warning("Attaching an older type of BigMatrix. Use updateObject method to update.") }
                            },
-                           getValues=function(i,j,drop=TRUE) {
+                           getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
-                             if (!missing(i) && is.character(i)) { i = match(i,base::rownames(object)) }
-                             if (!missing(j) && is.character(j)) { j = match(j,base::colnames(object)) }
+                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames) }
+                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames) }
                              if (missing(i)) {
                                if (missing(j)) {
-                                 return(object[,,drop=drop])
+                                 x = object[,,drop=drop]
                                } else {
-                                 return(object[,j,drop=drop])
-                               }
+                                 x = object[,j,drop=drop]
+                                 }
                              } else {
                                if (missing(j)) {
-                                 return(object[i,,drop=drop])
+                                 x = object[i,,drop=drop]
                                } else {
-                                 return(object[i,j,drop=drop])
+                                 x = object[i,j,drop=drop]
                                }
                              }
+                             if (withDimnames == TRUE && base::length(x) > 1) {
+                               if (is.matrix(x)) {
+                                 if (!is.null(.self$rownames) && !is.null(.self$colnames)) {
+                                   if (missing(i)) { i = seq.int(1, .self$nrow())}
+                                   if (missing(j)) { j = seq.int(1, .self$ncol())}
+                                   dimnames(x) = list(.self$.rownames[i], .self$.colnames[j])
+                                 }
+                               } else {
+                                 if (missing(i) && !is.null(.self$rownames)) { names(x) = .self$.rownames }
+                                 if (missing(j) && !is.null(.self$colnames)) { names(x) = .self$.colnames }
+                               }
+                             }
+                             return(x)
                            },
                            setValues=function(i,j,value) {
                              object = .self$bigmat
                              bigmemory:::checkReadOnly(object)
-                             if (!missing(i) && is.character(i)) { i = match(i,base::rownames(object)) }
-                             if (!missing(j) && is.character(j)) { j = match(j,base::colnames(object)) }
+                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames) }
+                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames) }
                              if (missing(i)) {
                                if (missing(j)) {
                                  object[,] <- value
@@ -177,11 +166,24 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                }
                              }
                            },
-                           save=function() {
-                             saveRDS( describe(.self$bigmat), file=.self$descpath )
+                           save=function(rdsfile) {
+                             saveRDS( .self, rdsfile )
                            },
                            show=function() {
-                             message( class(.self), "\ndescpath:", .self$descpath, "\ndatapath:", .self$datapath, "\nnrow:", .self$nrow(), "\nncol:", .self$ncol(), "\n")
+                             message( class(.self),
+                                     "\nbackingfile :", .self$backingfile, "\n", 
+                                     "dim: ", paste(.self$dim(), collapse=", ")
+                                     )
+                             if (!is.null(.self$rownames())) {
+                               message("rownames: ", paste(head(.self$rownames()), collapse=", "), " ...")
+                             } else {
+                               message("rownames: NULL")
+                             }
+                             if (!is.null(.self$colnames())) {
+                               message("colnames: ", paste(head(.self$colnames()), collapse=", "), " ...")
+                             } else {
+                               message("colnames: NULL")
+                             }
                              if (is.nil(.self$.bm@address)) {
                                message("Object is not currently attached to on-disk data.\n")
                              } else {
@@ -192,17 +194,11 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                          )
 
 setValidity("BigMatrix", function(object) {
-  if (!file.exists(object$descpath)) {
-    return("Description file does not exist")
-  } 
-  if (!file.exists(object$datapath)) {
-    return("Data file does not exist")
+  if (!file.exists(object$backingfile)) {
+    return("Backingfile does not exist")
   }
-  if (file.access(object$descpath,4) < 0) {
-    return("Description file is not readable")
-  }
-  if (file.access(object$datapath,4) < 0) {
-    return("Data file is not readable")
+  if (file.access(object$backingfile,4) < 0) {
+    return("Backingfile is not readable")
   }
   return(TRUE)
 })
@@ -212,8 +208,8 @@ setValidity("BigMatrix", function(object) {
 
 ##' @exportMethod '['
 setMethod('[', signature(x = "BigMatrix"),
-          function(x,i,j,drop=TRUE) {
-            return(x$getValues(i,j,drop=drop))
+          function(x,i,j,..., drop=TRUE) {
+            return(x$getValues(i,j,..., drop=drop))
           })
 
 ##' @exportMethod '[<-'
@@ -281,18 +277,21 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' @return BigMatrix
 ##' @keywords internal
 ##' @rdname initBigMatrix
-.initBigMatrix = function(x=NULL, class=c("BigMatrix","BigMatrixFactor"), backingfile, nrow, ncol, dimnames, type="double", ...) {
+.initBigMatrix = function(x=NULL, class=c("BigMatrix"), backingfile, nrow, ncol, dimnames=NULL, type="double", ...) {
   class = match.arg(class)
   backingpath = dirname(backingfile)
   dir.create(backingpath,showWarnings=FALSE,recursive=TRUE)
   backingpath = normalizePath(backingpath)
-  backingfile = basename(backingfile)
   descriptorfile = paste(backingfile,".desc",sep="")
   if (is.matrix(x)) {
-    new.matrix = as.big.matrix(x, backingpath=backingpath, descriptorfile=descriptorfile, backingfile=backingfile)
+    if (is.null(dimnames)) {
+      dimnames = dimnames(x)
+      dimnames(x) = NULL
+    }
+    new.matrix = as.big.matrix(x, backingpath=backingpath, descriptorfile=basename(descriptorfile), backingfile=basename(backingfile))
   } else if (is.big.matrix(x)) {
     if( is.nil(x@address) ) {
-      tryCatch( { x = attach.big.matrix(descpath) },
+      tryCatch( { x = attach.big.matrix(descriptorfile) },
                error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
     }
     new.matrix = x
@@ -301,17 +300,15 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
       init=x, 
       nrow=nrow,ncol=ncol,
       type=type,
-      backingfile=backingfile,
-      descriptorfile=descriptorfile,
-      backingpath=backingpath,
-      dimnames=dimnames)
+      backingfile=basename(backingfile),
+      descriptorfile=basename(descriptorfile),
+      backingpath=backingpath)
   } else {
     stop("Argument x must be a scalar numeric, matrix, or big.matrix.\n")
   }
-  descpath = file.path(backingpath,paste(descriptorfile,".rds",sep=""))
   unlink(file.path(backingpath,descriptorfile))  # Delete bigmemory version of desc file until they stop using dput/dget
-  bm = getRefClass(class)$new(.bm=new.matrix,descpath=descpath, ...)
-  bm$save()
+  description = describe(new.matrix)@description # description method is not exported and it just does this anyway
+  bm = getRefClass(class)$new(.bm=new.matrix, description=description, backingfile=backingfile, .rownames=dimnames[[1]], .colnames=dimnames[[2]], ...)
   if (!validObject(bm)) {
     stop("Failed to create a valid ", class, "!\n")
   }
@@ -327,7 +324,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' @param ncol integer, number of columns in the matrix we are about to create
 ##' @param dimnames list, list(rownames,colnames), as for a typical matrix
 ##' @param type character type of big.matrix (double, integer, char)
-##' @return BigMatrixFactor
+##' @return BigMatrix
 ##' @examples
 ##' dnames = dimnames=list(letters[1:3],LETTERS[1:3])
 ##' x = matrix(1:9,ncol=3,dimnames=dnames)
@@ -338,3 +335,29 @@ BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="doubl
   bm = .initBigMatrix(x=x, class="BigMatrix",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, type=type)
   return( bm )
 }
+
+##' Update previous BigMatrix type to new BigMatrix
+##'
+##' BigMatrix has changed some of its internal storage to eliminate the descriptor file and to keep the dimnames on the R side. This function will take a
+##' Version <= 1.3 type and update it to the Version >=1.4 type.
+##' @param object BigMatrix
+##' @export 
+##' @return BigMatrix
+setMethod("updateObject", signature=signature(object="BigMatrix"), function(object) {
+  tryCatch(
+    { desc = readRDS(object$descpath) }, 
+    error = function(e) { stop(sprintf("Failed to read descriptor file when updating BigMatrix.%s\n", e))} )
+  desc.list = desc@description
+  dimnames = list(desc.list$rowNames, desc.list$colNames)
+  desc.list$rowNames = desc.list$colNames = NULL
+  new.desc = new('big.matrix.descriptor',  description=desc.list)
+  bm = attach.resource(new.desc, path=dirname(object$datapath))
+  if (class(object) == "BigMatrixFactor") {
+    bigmat = BigMatrix(x=bm, backingfile=object$datapath, dimnames=dimnames, levels=object$levels)
+  } else {
+    bigmat = BigMatrix(x=bm, backingfile=object$datapath, dimnames=dimnames)
+  }
+  return(bigmat)
+})
+
+# benchmark(x = theta$getValues(,  1),  y = theta2$getValues(,  1),  z = theta2$getValues(,  1,  withDimnames=FALSE),  replications=5)
