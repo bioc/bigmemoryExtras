@@ -61,6 +61,7 @@ test_write <- function() {
   checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
   Sys.chmod(ds$backingfile,"0644")
   ds$attach(force=TRUE)
+  return(TRUE)
 }
 
 test_describing <- function() {
@@ -115,7 +116,7 @@ test_update <- function() {
   object.file = system.file("unitTests/tdata/old.ds.rda", package="bigmemoryExtras")
   desc.file = system.file("unitTests/tdata/ds.desc.rds", package="bigmemoryExtras")
   ds = get(load(object.file))
-  ds$descpath = desc.file
+  ds@.xData$descpath = desc.file
   newds = updateObject(ds)
   checkTrue(validObject(newds))
   checkIdentical(rownames, rownames(newds))

@@ -351,11 +351,12 @@ setMethod("updateObject", signature=signature(object="BigMatrix"), function(obje
   dimnames = list(desc.list$rowNames, desc.list$colNames)
   desc.list$rowNames = desc.list$colNames = NULL
   new.desc = new('big.matrix.descriptor',  description=desc.list)
-  bm = attach.resource(new.desc, path=dirname(object$datapath))
+  bm = attach.resource(new.desc, path=dirname(object$descpath))
+  backingfile = file.path( dirname(object$descpath), desc.list$filename)
   if (class(object) == "BigMatrixFactor") {
-    bigmat = BigMatrix(x=bm, backingfile=object$datapath, dimnames=dimnames, levels=object$levels)
+    bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames, levels=object$levels)
   } else {
-    bigmat = BigMatrix(x=bm, backingfile=object$datapath, dimnames=dimnames)
+    bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames)
   }
   return(bigmat)
 })
