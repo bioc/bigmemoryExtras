@@ -7,26 +7,26 @@ char.mat = matrix()
   
 back.dir = tempdir()
 ds.data.file = file.path(back.dir,"bigmat","ds")
-ds = BigMatrix2(mat,ds.data.file,3,3,list(rownames,colnames))
+ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 
 test_creation <- function() {
   back.dir = tempdir()
   back.file = tempfile()
-  ds = BigMatrix2(mat,back.file)
+  ds = BigMatrix(mat,back.file)
   checkTrue(validObject(ds))
   checkEquals(ds[,],mat)
   
-  ds = BigMatrix2(ds$bigmat,back.file, dimnames=dimnames(mat))
+  ds = BigMatrix(ds$bigmat,back.file, dimnames=dimnames(mat))
   checkTrue(validObject(ds))
   checkEquals(ds[,],mat)
 
-  ds = BigMatrix2(x=NULL,tempfile(),3,3,list(rownames,colnames))
+  ds = BigMatrix(x=NULL,tempfile(),3,3,list(rownames,colnames))
   ds[,] = mat
   checkTrue(validObject( ds ))
   checkEquals(ds[,],mat)
-  checkException( BigMatrix2(x=1:4, tempfile()), "x must be NULL, scalar numeric, matrix, or bigmatrix.", silent=TRUE)
-  checkEquals( BigMatrix2(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12, "BigMatrix2 creation with a scalar init value.")
-  na_bm = BigMatrix2(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
+  checkException( BigMatrix(x=1:4, tempfile()), "x must be NULL, scalar numeric, matrix, or bigmatrix.", silent=TRUE)
+  checkEquals( BigMatrix(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12, "BigMatrix creation with a scalar init value.")
+  na_bm = BigMatrix(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
   checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
 }
 
@@ -49,23 +49,23 @@ test_subset <- function() {
 
 test_write <- function() {
   ds[1,1] = 5
-  checkIdentical(ds[1,1],5,"Writing to a BigMatrix2")
+  checkIdentical(ds[1,1],5,"Writing to a BigMatrix")
   ds[2,] = 5
-  checkIdentical(ds[2,],c(A=5,B=5,C=5),"Writing row to a BigMatrix2")
+  checkIdentical(ds[2,],c(A=5,B=5,C=5),"Writing row to a BigMatrix")
   ds[,2] = 7
-  checkIdentical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix2")
+  checkIdentical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix")
   ds[,] = mat
-  checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix2")
+  checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix")
   Sys.chmod(ds$backingfile,"0444")
   ds$attach(force=TRUE)
-  checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix2 with a non-writeable data file")
+  checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
   Sys.chmod(ds$backingfile,"0644")
   ds$attach(force=TRUE)
 }
 
 test_describing <- function() {
   mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
-  ds = BigMatrix2(mat,ds.data.file,3,3,list(rownames,colnames))
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   # Getting
   checkEquals(nrow(ds),nrow(mat))
   checkEquals(ncol(ds),ncol(mat))
@@ -77,11 +77,11 @@ test_describing <- function() {
   dimnames(ds) = new.dimnames
   checkIdentical(dimnames(ds), new.dimnames)
   
-  ds = BigMatrix2(mat,ds.data.file,3,3,list(rownames,colnames))
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   colnames(ds) = new.dimnames[[2]]
   checkIdentical(colnames(ds), new.dimnames[[2]])
 
-  ds = BigMatrix2(mat,ds.data.file,3,3,list(rownames,colnames))
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   rownames(ds) = new.dimnames[[1]]
   checkIdentical(rownames(ds), new.dimnames[[1]])
 }
@@ -89,7 +89,7 @@ test_describing <- function() {
 test_reattach <- function() {
   mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
   data.file = tempfile()
-  old.ds = BigMatrix2(mat,data.file,3,3,list(rownames,colnames))
+  old.ds = BigMatrix(mat,data.file,3,3,list(rownames,colnames))
   object.file = paste(data.file,".rds",sep="")
   saveRDS(old.ds,file=object.file)
   new.ds = readRDS(object.file)
@@ -101,7 +101,7 @@ test_reattach <- function() {
 test_paths <- function() {
   checkEquals(normalizePath(ds$backingfile),ds.data.file)
   new.data.file = tempfile()
-  new.ds = BigMatrix2(mat,new.data.file,3,3,list(rownames,colnames))
+  new.ds = BigMatrix(mat,new.data.file,3,3,list(rownames,colnames))
   even.newer.data.file = tempfile()
   checkException({new.ds$backinfile = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
   file.copy(ds.data.file,even.newer.data.file)

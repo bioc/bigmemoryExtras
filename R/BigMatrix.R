@@ -277,7 +277,7 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
 ##' @return BigMatrix
 ##' @keywords internal
 ##' @rdname initBigMatrix
-.initBigMatrix = function(x=NULL, class=c("BigMatrix"), backingfile, nrow, ncol, dimnames=NULL, type="double", ...) {
+.initBigMatrix = function(x=NULL, class=c("BigMatrix", "BigMatrixFactor"), backingfile, nrow, ncol, dimnames=NULL, type="double", ...) {
   class = match.arg(class)
   backingpath = dirname(backingfile)
   dir.create(backingpath,showWarnings=FALSE,recursive=TRUE)

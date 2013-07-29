@@ -28,7 +28,7 @@
   integer, char)}
 }
 \value{
-  BigMatrixFactor
+  BigMatrix
 }
 \description{
   Create a new BigMatrix

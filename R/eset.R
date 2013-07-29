@@ -1,5 +1,5 @@
 #####  Functions to use BigMatrix with Biobase's eSet-derived objects
-##' @importFrom Biobase annotatedDataFrameFrom
+##' @importFrom Biobase annotatedDataFrameFrom assayDataElementNames assayDataElement
 NULL
 
 
@@ -25,10 +25,7 @@ NULL
 ##' original eSet only necessary if using a list type assayData, which is rare.
 ##' @export 
 attachAssayDataElements <- function(aData) {
-  if (!requireNamespace("Biobase",quietly=TRUE)) {
-    stop("Failed to require Biobase package.\n")
-  }
-  for( ad.name in Biobase:::assayDataElementNames(aData)) {
+  for( ad.name in assayDataElementNames(aData)) {
     if ( is( aData[[ad.name]], "BigMatrix" ) ) {
       aData[[ad.name]]$attach()
     }
@@ -47,17 +44,14 @@ attachAssayDataElements <- function(aData) {
 ##' @param ds eSet
 ##' @param dir character, path to directory holding all BigMatrix files
 ##' @return eSet
-##' @examples \dontrun{ eset = updateAssayDataElementPathss(eset, "/new/path/to/bigmat/dir") }
+##' @examples \dontrun{ eset = updateAssayDataElementPaths(eset, "/new/path/to/bigmat/dir") }
 ##' @export 
 ##' @author Peter M. Haverty \email{phaverty@@gene.com}
 updateAssayDataElementPaths <- function(ds, dir) {
-  if (!requireNamespace("Biobase",quietly=TRUE)) {
-    stop("Failed to require Biobase package.\n")
-  }
-  for (ad.name in Biobase:::assayDataElementNames(ds)) {
-    if (is(Biobase:::assayDataElement(ds,ad.name),"BigMatrix")) {
-      ad = Biobase:::assayDataElement(ds,ad.name)
-      ad$descpath = file.path( dir, basename(Biobase:::assayDataElement(ds,ad.name)$descpath))
+  for (ad.name in assayDataElementNames(ds)) {
+    if (is(assayDataElement(ds,ad.name),"BigMatrix")) {
+      ad = assayDataElement(ds,ad.name)
+      ad$descpath = file.path( dir, basename(assayDataElement(ds,ad.name)$descpath))
     }
   }
   return(invisible(ds))

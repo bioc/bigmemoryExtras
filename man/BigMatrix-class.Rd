@@ -15,6 +15,7 @@
 \alias{ncol,BigMatrix-method}
 \alias{nrow,BigMatrix-method}
 \alias{apply,BigMatrix-method}
+\alias{updateObject,BigMatrix-method}
 
 \title{Class \code{"BigMatrix"}}
 \description{

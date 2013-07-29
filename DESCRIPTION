@@ -2,7 +2,7 @@ Package: bigmemoryExtras
 Type: Package
 Title: An extension of the bigmemory package with added safety, convenience,
     and a factor class.
-Version: 1.4.7
+Version: 1.5.0
 Author: Peter M. Haverty
 Maintainer: Peter M. Haverty <phaverty@gene.com>
 Description: This package defines a "BigMatrix" ReferenceClass which adds
@@ -39,4 +39,3 @@ Collate:
     'eset.R'
     'zzz.R'
     'test_bigmemoryExtras_package.R'
-    'BigMatrix2.R'

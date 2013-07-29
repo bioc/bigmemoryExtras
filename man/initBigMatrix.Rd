@@ -4,7 +4,7 @@
 \usage{
   .initBigMatrix(x = NULL,
     class = c("BigMatrix", "BigMatrixFactor"), backingfile,
-    nrow, ncol, dimnames, type = "double", ...)
+    nrow, ncol, dimnames = NULL, type = "double", ...)
 }
 \arguments{
   \item{x}{NULL, matrix, or big.matrix. Optional data or

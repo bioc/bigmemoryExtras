@@ -25,7 +25,7 @@
   fields of the relevant BigMatrix objects.
 }
 \examples{
-\dontrun{ eset = updateAssayDataElementPathss(eset, "/new/path/to/bigmat/dir") }
+\dontrun{ eset = updateAssayDataElementPaths(eset, "/new/path/to/bigmat/dir") }
 }
 \author{
   Peter M. Haverty \email{phaverty@gene.com}
