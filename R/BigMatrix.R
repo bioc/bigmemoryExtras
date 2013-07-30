@@ -98,6 +98,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              return( .self$description$nrow * .self$description$ncol )
                            },
                            attach=function(force=FALSE) {
+                             if ("datapath" %in% ls(.self)) { stop("Attempting to attach an older type of BigMatrix. Please use the updateObject function first.") }
                              if (force == FALSE && ! is.nil(.self$.bm@address)) {
                                message("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
                              } else {
@@ -114,7 +115,6 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                },
                                         error = function(e) { stop("Failed to attach big.matrix on disk component.\n") } )
                              }
-                             if ("datapath" %in% ls(.self)) { warning("Attaching an older type of BigMatrix. Use updateObject method to update.") }
                            },
                            getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
