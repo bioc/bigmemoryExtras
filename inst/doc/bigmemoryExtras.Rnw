@@ -65,20 +65,11 @@ your new BigMatrix object to disk for later use.  You might save your
 object using R's built in save or saveRDS functions.
 
 <<reattach>>=
-ds$descpath
+ds$backingfile
 saveRDS(ds,file=file.path(tempdir(),"foo.rds"))
 new.ds = readRDS(file=file.path(tempdir(),"foo.rds"))
 new.ds[1:2,2:3]
 @ 
-
-\section{Files}
-The bigmemory package creates two files for each object: one binary file for the matrix
-data (the ``backingfile'') and one text file with meta-data about its
-matrix (the ``descriptor'' file). The functions dget and dput are used to access
-this meta-data. For large matrices with dimnames, this can take a
-while. BigMatrix replaces the descriptor file with a binary one that uses readRDS and saveRDS, 
-which requires about 1/10 the time to read when it's time
-to attach an object to the backingfile.
 
 \section{S4 Style Access}
 The BigMatrix class uses R's Reference Class system. Any change to the
@@ -135,10 +126,9 @@ exprs(eset)[1:2,2:3]
 
 new.dir = file.path(tempdir(),"newbigmat")
 dir.create(new.dir,showWarnings=FALSE)
-file.copy(ds$descpath, new.dir)
-file.copy(ds$datapath, new.dir)
+file.copy(ds$backingfile, new.dir)
 updateAssayDataElementPaths( assayData(eset), new.dir )
-assayDataElement(eset,"exprs")$descpath
+assayDataElement(eset,"exprs")$backingfile
 attachAssayDataElements( eset )
 
 @ 

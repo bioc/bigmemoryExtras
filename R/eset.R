@@ -51,7 +51,7 @@ updateAssayDataElementPaths <- function(ds, dir) {
   for (ad.name in assayDataElementNames(ds)) {
     if (is(assayDataElement(ds,ad.name),"BigMatrix")) {
       ad = assayDataElement(ds,ad.name)
-      ad$descpath = file.path( dir, basename(assayDataElement(ds,ad.name)$descpath))
+      ad$backingfile = file.path( dir, basename(assayDataElement(ds,ad.name)$backingfile))
     }
   }
   return(invisible(ds))
