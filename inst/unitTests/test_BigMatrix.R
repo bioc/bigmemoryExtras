@@ -45,6 +45,10 @@ test_subset <- function() {
   ds["b","B"] = 3
   mat["b","B"] = 3
   checkIdentical( ds[,], mat,"After re-setting some values" )
+  mat_nonames = mat
+  dimnames(mat_nonames) = NULL
+  ds_nonames = BigMatrix(mat_nonames,tempfile(),3,3)
+  checkIdentical( ds_nonames[,], mat_nonames, "Get full matrix from BM w/o dimnames" )
 }
 
 test_write <- function() {

@@ -78,7 +78,11 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            }, 
                            dimnames = function(value) {
                              if (missing(value)) {
-                               return(list(.self$.rownames, .self$.colnames))
+                               if (is.null(.self$.rownames) && is.null(.self$.rownames) ) {
+                                 return(NULL)
+                               } else {
+                                 return(list(.self$.rownames, .self$.colnames))
+                               }
                              } else {
                                if (!is.null(value) && base::length(value) != 2) { stop("dimnames must be set with a list of length 2.") }
                                .self$.rownames = value[[1]]
@@ -118,8 +122,8 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            },
                            getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
-                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames) }
-                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames) }
+                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames()) }
+                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames()) }
                              if (missing(i)) {
                                if (missing(j)) {
                                  x = object[,,drop=drop]
@@ -135,14 +139,14 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              }
                              if (withDimnames == TRUE && base::length(x) > 1) {
                                if (is.matrix(x)) {
-                                 if (!is.null(.self$rownames) && !is.null(.self$colnames)) {
+                                 if (!is.null(.self$rownames()) && !is.null(.self$colnames())) {
                                    if (missing(i)) { i = seq.int(1, .self$nrow())}
                                    if (missing(j)) { j = seq.int(1, .self$ncol())}
                                    dimnames(x) = list(.self$.rownames[i], .self$.colnames[j])
                                  }
                                } else {
-                                 if (missing(i) && !is.null(.self$rownames)) { names(x) = .self$.rownames }
-                                 if (missing(j) && !is.null(.self$colnames)) { names(x) = .self$.colnames }
+                                 if (missing(i) && !is.null(.self$rownames())) { names(x) = .self$.rownames }
+                                 if (missing(j) && !is.null(.self$colnames())) { names(x) = .self$.colnames }
                                }
                              }
                              return(x)
