@@ -122,8 +122,8 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            },
                            getValues=function(i,j,drop=TRUE, withDimnames=TRUE) {
                              object = .self$bigmat
-                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames()) }
-                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames()) }
+                             if (!missing(i) && is.character(i)) { i = match(i,.self$.rownames) }
+                             if (!missing(j) && is.character(j)) { j = match(j,.self$.colnames) }
                              if (missing(i)) {
                                if (missing(j)) {
                                  x = object[,,drop=drop]
