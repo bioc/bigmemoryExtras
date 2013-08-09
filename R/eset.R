@@ -1,5 +1,6 @@
 #####  Functions to use BigMatrix with Biobase's eSet-derived objects
 ##' @importFrom Biobase annotatedDataFrameFrom assayDataElementNames assayDataElement
+##' @importClassesFrom Biobase AssayData eSet
 NULL
 
 
