@@ -358,7 +358,7 @@ setMethod("updateObject", signature=signature(object="BigMatrix"), function(obje
   bm = attach.resource(new.desc, path=dirname(object$descpath))
   backingfile = file.path( dirname(object$descpath), desc.list$filename)
   if (class(object) == "BigMatrixFactor") {
-    bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames, levels=object$levels)
+    bigmat = BigMatrixFactor(x=bm, backingfile=backingfile, dimnames=dimnames, levels=object$levels)
   } else {
     bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames)
   }
