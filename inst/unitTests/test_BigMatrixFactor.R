@@ -41,11 +41,7 @@ test_subset <- function() {
   checkIdentical( fs[,1], fac1 )
   checkIdentical( fs[2,], fac2 )
 }
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##' @export 
-##' @return 
+
 test_write <- function() {
   onecol = factor(c(2,NA,1), levels=c("AA", "BB"))
   names(onecol) = rownames
