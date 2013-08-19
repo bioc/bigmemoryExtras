@@ -306,7 +306,8 @@ setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { appl
       type=type,
       backingfile=basename(backingfile),
       descriptorfile=basename(descriptorfile),
-      backingpath=backingpath)
+      backingpath=backingpath,
+      dimnames=NULL)
   } else {
     stop("Argument x must be a scalar numeric, matrix, or big.matrix.\n")
   }

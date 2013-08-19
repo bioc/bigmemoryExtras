@@ -58,7 +58,8 @@ test_write <- function() {
   dim(retmat) = c(5, 5)
   attributes(retmat) = attributes(retmat)[c("dim", "class", "levels")]
   attr(retmat, "class") = c("matrix", "factor")
-  checkIdentical( fs[, ], retmat, "Setting BMF with bad characters gives NAs")
+  fs_return = fs[,]; dimnames(fs_return) = NULL  # Hack for bad handling of dimnames when they are NULL by bigmemory < 4.4.4
+  checkIdentical( fs_return, retmat, "Setting BMF with bad characters gives NAs")
 
   fs2 = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, levels=c('A', '9', 'B', '12'))
   fs2[, ] = "A"
@@ -68,7 +69,8 @@ test_write <- function() {
   dim(retmat2) = c(3, 3)
   attributes(retmat2) = attributes(retmat2)[c("dim", "class", "levels")]
   attr(retmat2, "class") = c("matrix", "factor")
-  checkIdentical( retmat2, fs2[, ])
+  fs2_return = fs2[,]; dimnames(fs2_return) = NULL  # Hack for bad handling of dimnames when they are NULL by bigmemory < 4.4.4
+  checkIdentical( retmat2, fs2_return)
 }
 
 test_levels <- function() {

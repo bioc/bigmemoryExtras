@@ -36,6 +36,7 @@ test_coercion <- function() {
 }
 
 test_subset <- function() {
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   checkIdentical( ds[1,3], mat[1,3] )
   checkIdentical( ds[1,], mat[1,] )
   checkIdentical( ds[,2], mat[,2] )
@@ -48,8 +49,13 @@ test_subset <- function() {
   mat_nonames = mat
   dimnames(mat_nonames) = NULL
   ds_nonames = BigMatrix(mat_nonames,tempfile(),3,3)
-  checkIdentical( ds_nonames[,], mat_nonames, "Get full matrix from BM w/o dimnames" )
+  ds_nonames_return = ds_nonames[,];   dimnames(ds_nonames_return) = NULL  # Hack for bad handling of dimnames when they are NULL by bigmemory < 4.4.4
+  checkIdentical( ds_nonames_return, mat_nonames, "Get full matrix from BM w/o dimnames" )
 }
+
+
+
+
 
 test_write <- function() {
   ds[1,1] = 5
