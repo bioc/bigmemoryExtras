@@ -110,7 +110,7 @@ test_reattach <- function() {
 }
 
 test_paths <- function() {
-  checkEquals(normalizePath(ds$backingfile),ds.data.file)
+  checkEquals(normalizePath(ds$backingfile),normalizePath(ds.data.file))
   new.data.file = tempfile()
   new.ds = BigMatrix(mat,new.data.file,3,3,list(rownames,colnames))
   even.newer.data.file = tempfile()
