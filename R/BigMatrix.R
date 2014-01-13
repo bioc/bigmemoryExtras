@@ -57,8 +57,15 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            .rownames="characterOrNull", 
                            .colnames="characterOrNull",
                            description="list",
-                           .bm="big.matrix"
-                           ),
+                           .bm="big.matrix", 
+                           datafile = function(value) {
+                             .Deprecated(new=backingfile, msg="The datafile is now called 'backingfile' like in bigmemory proper.")
+                             if (missing(value)) {
+                               return(.self$backingfile)
+                             } else {
+                               .self$backingfile = value
+                             }
+                           }),
                          methods=list(
                            rownames = function(value) {
                              if (missing(value)) {

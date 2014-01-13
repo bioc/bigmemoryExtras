@@ -53,10 +53,6 @@ test_subset <- function() {
   checkIdentical( ds_nonames_return, mat_nonames, "Get full matrix from BM w/o dimnames" )
 }
 
-
-
-
-
 test_write <- function() {
   ds[1,1] = 5
   checkIdentical(ds[1,1],5,"Writing to a BigMatrix")
@@ -71,6 +67,7 @@ test_write <- function() {
   checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
   Sys.chmod(ds$backingfile,"0644")
   ds$attach(force=TRUE)
+  checkIdentical(ds[1, 1], 1, "OK read after chmod to readable and attach.")
   return(TRUE)
 }
 
