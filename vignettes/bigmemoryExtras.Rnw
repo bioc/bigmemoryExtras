@@ -7,10 +7,10 @@
 \usepackage{hyperref}
 \usepackage{Sweave}
 
-\newcommand{\Rfunction}[1]{{\texttt{#1}}} 
-\newcommand{\Robject}[1]{{\texttt{#1}}} 
-\newcommand{\Rpackage}[1]{{\textit{#1}}} 
-\newcommand{\Rclass}[1]{{\textit{#1}}} 
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
 
 \textwidth=6.5in
 \textheight=8.5in
@@ -28,7 +28,7 @@
 
 <<<options,echo=FALSE>>=
   options(width=90)
-@ 
+@
 
 \section{Introduction}
 This package defines a "BigMatrix" ReferenceClass which adds safety and convenience features to the filebacked.big.matrix class from the
@@ -69,7 +69,7 @@ ds$backingfile
 saveRDS(ds,file=file.path(tempdir(),"foo.rds"))
 new.ds = readRDS(file=file.path(tempdir(),"foo.rds"))
 new.ds[1:2,2:3]
-@ 
+@
 
 \section{S4 Style Access}
 The BigMatrix class uses R's Reference Class system. Any change to the
@@ -91,7 +91,7 @@ dimnames(ds)
 ds$dimnames()
 length(ds)
 ds$length()
-@ 
+@
 
 \section{BigMatrixFactor}
 The bigmemoryExtras package adds a ``BigMatrixFactor'' class to provide a
@@ -109,14 +109,30 @@ fs$levels
 levels(fs)
 fs[, 2]
 fs[, 2:3]
-@ 
+@
+
+\section{Use with GenomicRanges and SummarizedExperiment-derived Classes}
+
+Either class can be used as an assay in the assays slot
+of the GenomicRanges SummarizedExperiment-derived classes. We provide utility
+functions to deal with relocated BigMatrix in such a container.
+
+<<se>>=
+library(GenomicRanges)
+se = SummarizedExperiment(assays=list(a=ds, b=fs))
+assays(se)[["a"]]
+new.dir = file.path(tempdir(),"newbigmat")
+assays(se) = updateBackingfiles(assays(se), new.dir)
+assays(se)[["b"]]$backingfile
+@
 
 \section{Use with Biobase and eSet-derived Classes}
+We are phasing out Biobase and eSet in favor of GenomicRanges and
+SummarizedExperiment, but in the mean time ...
+
 Either class can be used as an assayDataElement in the assayData slot
 of the familiar BioConductor eSet-derived classes. We provide utility
-functions to deal with relocated BigMatrix files and to attach all of
-an eSet's BigMatrix assayDataElements.  Of course, you can also just
-let them attach themselves as necessary.
+functions to deal with relocated BigMatrix files.
 
 <<eset>>=
 library(Biobase)
@@ -129,8 +145,6 @@ dir.create(new.dir,showWarnings=FALSE)
 file.copy(ds$backingfile, new.dir)
 updateAssayDataElementPaths( assayData(eset), new.dir )
 assayDataElement(eset,"exprs")$backingfile
-attachAssayDataElements( eset )
-
-@ 
+@
 
 \end{document}
