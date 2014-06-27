@@ -1,4 +1,16 @@
+CHANGES IN VERSION 1.7.4
+--------------------------
 
+NEW FEATURES
+
+    o  The updateBackingpaths function allows bulk updating of backingfile directories for a
+       collection of BigMatrix objects. Not all objects in the collection must be of the
+       BigMatrix type.
+
+DEPRECATED AND DEFUNCT
+    o  All Biobase-related content is deprecated including updateAssayDataPaths
+       (see updateBackingfiles) and the annotatedDataFrameFrom trick for including
+       a BigMatrix in an eSet.
 
 # Tue 05-01-2012 - 09:15
 Version 0.1.8: [<- for BigFactorMatrix now converts incoming character value to integer
@@ -14,5 +26,3 @@ Version 1.4.0: Changed internal representation to optimize handling of dimnames 
 
 # Wed 06-26-2013 - 19:56
 Version 1.4.1: Better defaults for initial value of BigMatrix and BigMatrixFactor (NA_real_ and NA_integer_).  Giving x=NULL still provides the bigmemory feature of initializing to all zeros instantly.
-
-
