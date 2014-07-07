@@ -26,7 +26,6 @@
 ##' @import methods
 ##' @import bigmemory
 ##' @importFrom BiocGenerics updateObject
-##' @importFrom biganalytics apply
 NULL
 
 ### Modifications to big.matrix object from bigmemory to help with saving to and restoring from disk and to prevent usage of a nil address
@@ -59,12 +58,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            description="list",
                            .bm="big.matrix", 
                            datafile = function(value) {
-                             .Deprecated(new=backingfile, msg="The datafile is now called 'backingfile' like in bigmemory proper.")
-                             if (missing(value)) {
-                               return(.self$backingfile)
-                             } else {
-                               .self$backingfile = value
-                             }
+                             .Defunct(new=backingfile, msg="The datafile is now called 'backingfile' like in bigmemory proper.")
                            }),
                          methods=list(
                            rownames = function(value) {
@@ -272,7 +266,11 @@ setMethod("as.matrix",signature(x="BigMatrix"), function(x) { return(x[,]) })
 setAs("BigMatrix","matrix", function(from) { return(from[,]) })
 
 ##' @exportMethod apply
-setMethod("apply",signature(X="BigMatrix"), function(X, MARGIN, FUN, ...) { apply(X$bigmat, MARGIN, FUN, ...) })
+setMethod("apply",signature(X="BigMatrix"), 
+	function(X, MARGIN, FUN, ...) {
+		    if (! require("biganalytics", quietly=TRUE)) { stop("Failed to require 'biganalytics'\n.") }
+			     biganalytics::apply(X$bigmat, MARGIN, FUN, ...)
+	})
 
 ##' Create a new BigMatrix-derived class
 ##'
@@ -366,7 +364,7 @@ setMethod("updateObject", signature=signature(object="BigMatrix"), function(obje
   bm = attach.resource(new.desc, path=dirname(object$descpath))
   backingfile = file.path( dirname(object$descpath), desc.list$filename)
   if (class(object) == "BigMatrixFactor") {
-    bigmat = .initBigMatrix(x=bm, class="BigMatrixFactor", backingfile=backingfile, dimnames=dimnames, levels=object$levels)
+    bigmat = .initBigMatrix(x=bm, class="BigMatrixFactor", backingfile=backingfile, dimnames=dimnames, levels=levels(object))
   } else {
     bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames)
   }
