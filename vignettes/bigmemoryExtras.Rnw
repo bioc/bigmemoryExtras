@@ -122,6 +122,9 @@ library(GenomicRanges)
 se = SummarizedExperiment(assays=list(a=ds, b=fs))
 assays(se)[["a"]]
 new.dir = file.path(tempdir(),"newbigmat")
+dir.create(new.dir,showWarnings=FALSE)
+file.copy(ds$backingfile, new.dir)
+file.copy(fs$backingfile, new.dir)
 assays(se) = updateBackingfiles(assays(se), new.dir)
 assays(se)[["b"]]$backingfile
 @
@@ -134,7 +137,7 @@ Either class can be used as an assayDataElement in the assayData slot
 of the familiar BioConductor eSet-derived classes. We provide utility
 functions to deal with relocated BigMatrix files.
 
-<<eset, eval=FALSE>>=
+<<eset>>=
 library(Biobase)
 eset = ExpressionSet()
 data.file = file.path(tempdir(),"bigmat","ds")
