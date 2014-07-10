@@ -123,7 +123,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              return( .self$description$nrow * .self$description$ncol )
                            },
                            attach=function(force=FALSE) {
-                             if (force == FALSE && any(c("levels","datapath") %in% ls(.self))) {
+                             if (force == FALSE && ! all( vapply(.self, class, character(1)) %in% c("refMethodDef", "activeBindingFunction"))) {  # All data in private (dot prefix) member variables not seen by *apply or ls
                                  stop("Attempting to attach an older type of BigMatrix. Please use the updateObject function first.")
                              }
                              if (force == FALSE && ! is.nil(.self$.bm@address)) {

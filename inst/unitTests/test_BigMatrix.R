@@ -132,7 +132,7 @@ test_update <- function() {
   desc.file = system.file("unitTests/tdata/ds.desc.rds", package="bigmemoryExtras")
   ds = get(load(object.file))
   ds@.xData$descpath = desc.file
-  checkException(x[1, 1], "Should fail to attach an old-style object.", silent=TRUE)
+  checkException(ds[1, 1], "Should fail to attach an old-style object.", silent=TRUE)
   newds = updateObject(ds)
   checkTrue(validObject(newds))
   checkIdentical(rownames, rownames(newds))
