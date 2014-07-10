@@ -38,6 +38,11 @@ NULL
 setClassUnion("characterOrNull",c("character","NULL"))
 BigMatrixGenerator <- setRefClass("BigMatrix",
                          fields=list(
+                             .backingfile="character",
+                             .rownames="characterOrNull",
+                             .colnames="characterOrNull",
+                             .description="list",
+                             .bm="big.matrix",
                            bigmat=function(value) {
                              if (missing(value)) {
                                if (is.nil(.self$.bm@address)) {
@@ -52,11 +57,26 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                }
                              }
                            },
-                           backingfile="character",
-                           .rownames="characterOrNull",
-                           .colnames="characterOrNull",
-                           description="list",
-                           .bm="big.matrix",
+                           backingfile=function(value) {
+                               if (missing(value)) {
+                                   return(.self$.backingfile)
+                               } else {
+                                   if (file.exists(value)) {
+                                       .self$.description$filename = basename(value)
+                                       .self$.backingfile=value
+                                   } else {
+                                       stop("Specified 'backingfile' does not exist. Please move/copy the file before re-setting 'backingfile'.")
+                                   }
+                               }
+                           },
+                           description=function(value) {
+                               if (missing(value)) {
+                                   return(.self$.description)
+                               } else {
+                                   .self$backingfile = file.path(dirname(.self$.backingfile), value$filename)
+                                   .self$.description = value
+                               }
+                           },
                            datafile = function(value) {
                              .Defunct(new=backingfile, msg="The datafile is now called 'backingfile' like in bigmemory proper.")
                            }),
@@ -320,7 +340,7 @@ setMethod("apply",signature(X="BigMatrix"),
   }
   unlink(file.path(backingpath,descriptorfile))  # Delete bigmemory version of desc file until they stop using dput/dget
   description = describe(new.matrix)@description # description method is not exported and it just does this anyway
-  bm = getRefClass(class)$new(.bm=new.matrix, description=description, backingfile=backingfile, .rownames=dimnames[[1]], .colnames=dimnames[[2]], ...)
+  bm = getRefClass(class)$new(.bm=new.matrix, .description=description, .backingfile=backingfile, .rownames=dimnames[[1]], .colnames=dimnames[[2]], ...)
   if (!validObject(bm)) {
     stop("Failed to create a valid ", class, "!\n")
   }

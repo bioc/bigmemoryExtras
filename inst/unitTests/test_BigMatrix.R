@@ -114,12 +114,17 @@ test_paths <- function() {
   new.data.file = tempfile()
   new.ds = BigMatrix(mat,new.data.file,3,3,list(rownames,colnames))
   even.newer.data.file = tempfile()
-  checkException({new.ds$backinfile = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
+  checkException({new.ds$backingfile = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
   file.copy(ds.data.file,even.newer.data.file)
   new.ds$backingfile = even.newer.data.file
   even.newer.data.file = normalizePath(even.newer.data.file)
   checkEquals(normalizePath(new.ds$backingfile),even.newer.data.file)
   checkEquals(new.ds[,], ds[,])
+  checkEquals(basename(new.ds$backingfile), new.ds$.description$filename, "filename in description gets set by backingfile")
+  desc = new.ds$description
+  desc$filename = basename(new.data.file)
+  new.ds$description = desc
+  checkEquals(basename(new.ds$backingfile), new.ds$.description$filename, "filename in backingfile gets set by description")
 }
 
 test_update <- function() {
