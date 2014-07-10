@@ -134,7 +134,7 @@ Either class can be used as an assayDataElement in the assayData slot
 of the familiar BioConductor eSet-derived classes. We provide utility
 functions to deal with relocated BigMatrix files.
 
-<<eset>>=
+<<eset, eval=FALSE>>=
 library(Biobase)
 eset = ExpressionSet()
 data.file = file.path(tempdir(),"bigmat","ds")
