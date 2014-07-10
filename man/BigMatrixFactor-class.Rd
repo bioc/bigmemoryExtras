@@ -59,7 +59,8 @@ ds$levels
     \item{\code{datapath}:}{Object of class \code{activeBindingFunction} Full file path to the big.matrix backing file. }
     \item{\code{descpath}:}{Object of class \code{character} Full file path to the big.matrix metadata file. }
     \item{\code{.bm}:}{Object of class \code{big.matrix} Private storage of the big.matrix object. }
-    \item{\code{levels}:}{Object of class \code{character} Levels as in a typical factor. }
+    \item{\code{levels}:}{Object of class \code{activeBindingFunction} Public access to the levels. }
+    \item{\code{.levels}:}{Object of class \code{character} Levels as in a typical factor. }
   }
 }
 \section{Class-Based Methods}{
