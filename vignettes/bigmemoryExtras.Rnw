@@ -137,13 +137,16 @@ functions to deal with relocated BigMatrix files.
 <<eset>>=
 library(Biobase)
 eset = ExpressionSet()
+data.file = file.path(tempdir(),"bigmat","ds")
+x = matrix(1:9,ncol=3,dimnames=list(letters[1:3],LETTERS[1:3]))
+ds = BigMatrix(x,data.file)
 assayDataElement(eset,"exprs") = ds
 exprs(eset)[1:2,2:3]
 
 new.dir = file.path(tempdir(),"newbigmat")
 dir.create(new.dir,showWarnings=FALSE)
 file.copy(ds$backingfile, new.dir)
-updateAssayDataElementPaths( assayData(eset), new.dir )
+assayData(eset) = updateBackingfiles(assayData(eset), new.dir)
 assayDataElement(eset,"exprs")$backingfile
 @
 
