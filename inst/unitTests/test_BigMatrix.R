@@ -1,10 +1,13 @@
+library(bigmemoryExtras)
+library(RUnit)
+
 rownames = letters[1:3]
 colnames = LETTERS[1:3]
 mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
 int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
 levels = c("AA","BB")
 char.mat = matrix()
-  
+
 back.dir = tempdir()
 ds.data.file = file.path(back.dir,"bigmat","ds")
 ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
@@ -15,7 +18,7 @@ test_creation <- function() {
   ds = BigMatrix(mat,back.file)
   checkTrue(validObject(ds))
   checkEquals(ds[,],mat)
-  
+
   ds = BigMatrix(ds$bigmat,back.file, dimnames=dimnames(mat))
   checkTrue(validObject(ds))
   checkEquals(ds[,],mat)
@@ -84,7 +87,7 @@ test_describing <- function() {
   new.dimnames = list(letters[4:6], LETTERS[4:6])
   dimnames(ds) = new.dimnames
   checkIdentical(dimnames(ds), new.dimnames)
-  
+
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   colnames(ds) = new.dimnames[[2]]
   checkIdentical(colnames(ds), new.dimnames[[2]])

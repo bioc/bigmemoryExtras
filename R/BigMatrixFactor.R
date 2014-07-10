@@ -7,7 +7,14 @@
 BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                              contains="BigMatrix",
                                fields=list(
-                                 levels="character"
+                                   levels=function(value) {
+                                       if (missing(value)) {
+                                           return(.self$.levels)
+                                       } else {
+                                           stop("BigMatrixFactor levels are read-only.")
+                                       }
+                                   },
+                                   .levels="character"
                                  ),
                                methods=list(
                                  getValues=function(i, j, drop=TRUE) {
@@ -20,7 +27,7 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                    }
                                    attributes(mat) = att.list # This is the second time we set dimnames, so that could be improved.
                                    return(mat)
-                                 }, 
+                                 },
                                  setValues=function(i,j,value) {
                                    if (!is.character(value)) { value = as.character(value) }
                                    value = match(value,.self$levels)
@@ -35,7 +42,6 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor",
                                  }
                                 )
                                )
-BigMatrixFactorGenerator$lock("levels")
 
 ##' Create a new BigMatrixFactor
 ##'
@@ -66,7 +72,7 @@ BigMatrixFactor <- function(x=NA_character_,backingfile,nrow,ncol,dimnames=NULL,
   if (!is.character(x)) { x = as.character(x) }
   x = match(x, levels)
   attributes(x) = att.list
-  bm = .initBigMatrix(x=x,class="BigMatrixFactor",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, levels=levels, type=type)
+  bm = .initBigMatrix(x=x,class="BigMatrixFactor",backingfile=backingfile, nrow=nrow, ncol=ncol, dimnames=dimnames, .levels=levels, type=type)
   return( bm )
 }
 

@@ -1,3 +1,6 @@
+library(bigmemoryExtras)
+library(RUnit)
+
 rownames = letters[1:3]
 colnames = LETTERS[1:3]
 back.dir = tempdir()
@@ -12,7 +15,7 @@ fs = BigMatrixFactor(char.mat, backingfile=fs.data.file,nrow=3,ncol=3,dimnames=l
 
 test_creation <- function() {
   back.dir = tempdir()
-  
+
   fs = BigMatrixFactor(char.mat, backingfile=tempfile(), levels=levels)
   checkTrue(validObject(fs))
   checkEquals(fs[, ], factor.mat, "Initialize with char mat, gets right chars")

@@ -2,14 +2,14 @@
 ##'
 ##' This package defines a "BigMatrix" ReferenceClass which adds
 ##' safety and convenience features to the filebacked.big.matrix class from the
-##' bigmemory package. BigMatrix protects against segfaults by monitoring, and 
-##' gracefully restoring, the connection to on-disk data. It also protects 
-##' against accidental data modification with a filesystem-based permissions 
-##' system. We provide functionality for using BigMatrix-derived classes 
-##' as assayData matrices within the Biobase package's eSet family of classes. 
+##' bigmemory package. BigMatrix protects against segfaults by monitoring, and
+##' gracefully restoring, the connection to on-disk data. It also protects
+##' against accidental data modification with a filesystem-based permissions
+##' system. We provide functionality for using BigMatrix-derived classes
+##' as assayData matrices within the Biobase package's eSet family of classes.
 ##' BigMatrix provides some optimizations related to attaching to,
-##' and indexing into, file-backed matrices with dimnames. Additionally, the package 
-##' provides a "BigMatrixFactor" class, a file-backed matrix with factor 
+##' and indexing into, file-backed matrices with dimnames. Additionally, the package
+##' provides a "BigMatrixFactor" class, a file-backed matrix with factor
 ##' properties.
 ##'
 ##' BigMatrix stores the
@@ -53,10 +53,10 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              }
                            },
                            backingfile="character",
-                           .rownames="characterOrNull", 
+                           .rownames="characterOrNull",
                            .colnames="characterOrNull",
                            description="list",
-                           .bm="big.matrix", 
+                           .bm="big.matrix",
                            datafile = function(value) {
                              .Defunct(new=backingfile, msg="The datafile is now called 'backingfile' like in bigmemory proper.")
                            }),
@@ -68,7 +68,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                if (base::length(value) != .self$nrow()) { stop("Length of rownames must match the number of rows.") }
                              .self$.rownames = value
                              }
-                           }, 
+                           },
                            colnames = function(value) {
                              if (missing(value)) {
                                return(.self$.colnames)
@@ -76,7 +76,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                if (base::length(value) != .self$ncol()) { stop("Length of colnames must match the number of columns.") }
                              .self$.colnames = value
                              }
-                           }, 
+                           },
                            dimnames = function(value) {
                              if (missing(value)) {
                                if (is.null(.self$.rownames) && is.null(.self$.rownames) ) {
@@ -103,7 +103,9 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                              return( .self$description$nrow * .self$description$ncol )
                            },
                            attach=function(force=FALSE) {
-                             if ("datapath" %in% ls(.self)) { stop("Attempting to attach an older type of BigMatrix. Please use the updateObject function first.") }
+                             if (force == FALSE && any(c("levels","datapath") %in% ls(.self))) {
+                                 stop("Attempting to attach an older type of BigMatrix. Please use the updateObject function first.")
+                             }
                              if (force == FALSE && ! is.nil(.self$.bm@address)) {
                                message("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
                              } else {
@@ -176,7 +178,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            },
                            show=function() {
                              message( class(.self),
-                                     "\nbackingfile :", .self$backingfile, "\n", 
+                                     "\nbackingfile :", .self$backingfile, "\n",
                                      "dim: ", paste(.self$dim(), collapse=", ")
                                      )
                              if (!is.null(.self$rownames())) {
@@ -266,7 +268,7 @@ setMethod("as.matrix",signature(x="BigMatrix"), function(x) { return(x[,]) })
 setAs("BigMatrix","matrix", function(from) { return(from[,]) })
 
 ##' @exportMethod apply
-setMethod("apply",signature(X="BigMatrix"), 
+setMethod("apply",signature(X="BigMatrix"),
 	function(X, MARGIN, FUN, ...) {
 		    if (! require("biganalytics", quietly=TRUE)) { stop("Failed to require 'biganalytics'\n.") }
 			     biganalytics::apply(X$bigmat, MARGIN, FUN, ...)
@@ -306,7 +308,7 @@ setMethod("apply",signature(X="BigMatrix"),
     new.matrix = x
   } else if (is.null(x) || (is.numeric(x) && length(x) == 1)) {
     new.matrix = filebacked.big.matrix(
-      init=x, 
+      init=x,
       nrow=nrow,ncol=ncol,
       type=type,
       backingfile=basename(backingfile),
@@ -351,20 +353,30 @@ BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="doubl
 ##' BigMatrix has changed some of its internal storage to eliminate the descriptor file and to keep the dimnames on the R side. This function will take a
 ##' Version <= 1.3 type and update it to the Version >=1.4 type.
 ##' @param object BigMatrix
-##' @export 
+##' @export
 ##' @return BigMatrix
 setMethod("updateObject", signature=signature(object="BigMatrix"), function(object) {
-  tryCatch(
-    { desc = readRDS(object$descpath) }, 
-    error = function(e) { stop(sprintf("Failed to read descriptor file when updating BigMatrix.%s\n", e))} )
-  desc.list = desc@description
-  dimnames = list(desc.list$rowNames, desc.list$colNames)
-  desc.list$rowNames = desc.list$colNames = NULL
-  new.desc = new('big.matrix.descriptor',  description=desc.list)
-  bm = attach.resource(new.desc, path=dirname(object$descpath))
-  backingfile = file.path( dirname(object$descpath), desc.list$filename)
+    if ("descpath" %in% ls(object)) {
+        path = object$descpath
+        tryCatch(
+            { desc = readRDS(path) },
+            error = function(e) { stop(sprintf("Failed to read descriptor file when updating BigMatrix.\n%s\n", e))}
+            )
+
+        desc.list = desc@description
+        dimnames = list(desc.list$rowNames, desc.list$colNames)
+        desc.list$rowNames = desc.list$colNames = NULL
+        new.desc = new('big.matrix.descriptor',  description=desc.list)
+        bm = attach.resource(new.desc, path=dirname(object$descpath))
+        backingfile = file.path( dirname(object$descpath), desc.list$filename)
+    } else {
+        dimnames = list(object$.rownames, object$.colnames)
+        backingfile = object$backingfile
+        object$attach(force=TRUE)
+        bm = object$bigmat
+    }
   if (class(object) == "BigMatrixFactor") {
-    bigmat = .initBigMatrix(x=bm, class="BigMatrixFactor", backingfile=backingfile, dimnames=dimnames, levels=levels(object))
+    bigmat = .initBigMatrix(x=bm, class="BigMatrixFactor", backingfile=backingfile, dimnames=dimnames, .levels=object$levels)
   } else {
     bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames)
   }
