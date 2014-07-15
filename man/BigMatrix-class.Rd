@@ -15,7 +15,6 @@
 \alias{ncol,BigMatrix-method}
 \alias{nrow,BigMatrix-method}
 \alias{apply,BigMatrix-method}
-\alias{updateObject,BigMatrix-method}
 
 \title{Class \code{"BigMatrix"}}
 \description{
@@ -29,14 +28,14 @@ BigMatrix provides some optimizations related to attaching to, and indexing
 into, file-backed matrices with dimnames.
 
 A big.matrix object is backed by two files, a data file (backingfile)
-and a text metadata file (descriptor file). BigMatrix replaces 
-the text metadata file with a binary "rds" file, for faster access. The location of this file 
-is stored in the \code{descpath} field. The data in the metadata file is used to "attach" a 
-big.matrix object its on-disk data. BigMatrix stores the big.matrix object and checks for a 
-valid connection to the on-disk data each time it is necessary to access the big.matrix object. 
-Re-attachment, using the \code{attach} method and the \code{descpath} field is performed 
-as necessary. This avoids a segfault caused by accessing what could otherwise 
-be a nil pointer. For example, A nil pointer occurs when a big.matrix data is saved and loaded 
+and a text metadata file (descriptor file). BigMatrix replaces
+the text metadata file with a binary "rds" file, for faster access. The location of this file
+is stored in the \code{descpath} field. The data in the metadata file is used to "attach" a
+big.matrix object its on-disk data. BigMatrix stores the big.matrix object and checks for a
+valid connection to the on-disk data each time it is necessary to access the big.matrix object.
+Re-attachment, using the \code{attach} method and the \code{descpath} field is performed
+as necessary. This avoids a segfault caused by accessing what could otherwise
+be a nil pointer. For example, A nil pointer occurs when a big.matrix data is saved and loaded
 using \code{save()} and \code{load()}.
 
 Reference classes are a relatively new and unused feature of R. They
