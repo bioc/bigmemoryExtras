@@ -133,7 +133,7 @@ test_update <- function() {
   ds = get(load(object.file))
   ds@.xData$descpath = desc.file
   checkException(ds[1, 1], "Should fail to attach an old-style object.", silent=TRUE)
-  newds = updateObject(ds)
+  newds = updateBigMatrix(ds)
   checkTrue(validObject(newds))
   checkIdentical(rownames, rownames(newds))
   checkIdentical(colnames, colnames(newds))

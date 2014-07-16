@@ -25,7 +25,6 @@
 ##' @seealso BigMatrix-class BigMatrixFactor-class BigMatrix BigMatrixFactor filebacked.big.matrix ReferenceClasses
 ##' @import methods
 ##' @import bigmemory
-##' @importFrom BiocGenerics updateObject
 NULL
 
 ### Modifications to big.matrix object from bigmemory to help with saving to and restoring from disk and to prevent usage of a nil address
@@ -124,7 +123,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                            },
                            attach=function(force=FALSE) {
                              if (force == FALSE && ! all( vapply(.self, class, character(1)) %in% c("refMethodDef", "activeBindingFunction"))) {  # All data in private (dot prefix) member variables not seen by *apply or ls
-                                 stop("Attempting to attach an older type of BigMatrix. Please use the updateObject function first.")
+                                 stop("Attempting to attach an older type of BigMatrix. Please use the updateBigMatrix function first.")
                              }
                              if (force == FALSE && ! is.nil(.self$.bm@address)) {
                                message("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
@@ -375,7 +374,7 @@ BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="doubl
 ##' @param object BigMatrix
 ##' @export
 ##' @return BigMatrix
-setMethod("updateObject", signature=signature(object="BigMatrix"), function(object) {
+updateBigMatrix <- function(object) {
     if ("descpath" %in% ls(object)) {
         path = object$descpath
         tryCatch(
@@ -395,12 +394,12 @@ setMethod("updateObject", signature=signature(object="BigMatrix"), function(obje
         object$attach(force=TRUE)
         bm = object$bigmat
     }
-  if (class(object) == "BigMatrixFactor") {
-    bigmat = .initBigMatrix(x=bm, class="BigMatrixFactor", backingfile=backingfile, dimnames=dimnames, .levels=object$levels)
-  } else {
-    bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames)
-  }
-  return(bigmat)
-})
+    if (class(object) == "BigMatrixFactor") {
+        bigmat = .initBigMatrix(x=bm, class="BigMatrixFactor", backingfile=backingfile, dimnames=dimnames, .levels=object$levels)
+    } else {
+        bigmat = BigMatrix(x=bm, backingfile=backingfile, dimnames=dimnames)
+    }
+    return(bigmat)
+}
 
 # benchmark(x = theta$getValues(,  1),  y = theta2$getValues(,  1),  z = theta2$getValues(,  1,  withDimnames=FALSE),  replications=5)
