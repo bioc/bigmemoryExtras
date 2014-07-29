@@ -32,3 +32,4 @@ Suggests:
 biocViews: Infrastructure, DataRepresentation
 OS_type: unix
 Roxygen: list(wrap=TRUE)
+URL: https://github.com/phaverty/bigmemoryExtras-release
