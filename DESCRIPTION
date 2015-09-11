@@ -33,5 +33,4 @@ Suggests:
 biocViews: Infrastructure, DataRepresentation
 OS_type: unix
 VignetteBuilder: knitr
-Roxygen: list(wrap=TRUE)
 URL: https://github.com/phaverty/bigmemoryExtras
