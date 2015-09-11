@@ -1,6 +1,5 @@
 #####  Functions to use BigMatrix with Biobase's eSet-derived objects
-##' @importFrom Biobase annotatedDataFrameFrom assayDataElementNames assayDataElement
-##' @importClassesFrom Biobase AssayData eSet
+##' @importFrom Biobase annotatedDataFrameFrom
 NULL
 
 ##' Use BigMatrix in eSet assayData
@@ -15,7 +14,7 @@ NULL
 ##' @param object a BigMatrix
 setMethod("annotatedDataFrameFrom", signature(object="BigMatrix"),
           function(object) {
-#              .Deprecated("nothing", msg="All eSet-related content is being deprecated.")
+              .Deprecated("nothing", msg="All eSet-related content is being deprecated.")
               df = AnnotatedDataFrame(
                   data=data.frame(row.names=rownames(object)),
                   dimLabels=c("sampleNames", "sampleColumns")
@@ -44,13 +43,7 @@ setMethod("annotatedDataFrameFrom", signature(object="BigMatrix"),
 ##' original eSet only necessary if using a list type assayData, which is rare.
 ##' @export
 attachAssayDataElements <- function(aData) {
-    .Deprecated("nothing", msg="All eSet-related content is being deprecated.")
-    for( ad.name in assayDataElementNames(aData)) {
-        if ( is( aData[[ad.name]], "BigMatrix" ) ) {
-            aData[[ad.name]]$attach()
-        }
-    }
-    return(invisible(aData))
+    .Defunct()
 }
 
 ##' Update directory for BigMatrix assayDataElement to new location
@@ -68,12 +61,5 @@ attachAssayDataElements <- function(aData) {
 ##' @export
 ##' @author Peter M. Haverty \email{phaverty@@gene.com}
 updateAssayDataElementPaths <- function(ds, dir) {
-    .Deprecated("updateBackingfiles", "eSet-specific features are now deprecated.")
-    for (ad.name in assayDataElementNames(ds)) {
-        if (is(assayDataElement(ds,ad.name),"BigMatrix")) {
-            ad = assayDataElement(ds,ad.name)
-            ad$backingfile = file.path( dir, basename(assayDataElement(ds,ad.name)$backingfile))
-        }
-    }
-    return(invisible(ds))
+    .Defunct()
 }
