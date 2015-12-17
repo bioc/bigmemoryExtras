@@ -6,6 +6,7 @@ colnames = LETTERS[1:3]
 back.dir = tempdir()
 
 fs.data.file = file.path(back.dir,"bigmat","fs")
+unlink(fs.data.file)
 char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
 factor.mat = factor(char.mat, levels=c("AA", "BB"))
 attributes(factor.mat) = c(attributes(char.mat), list(class=c("matrix", "factor"), levels=levels(factor.mat)))
@@ -51,6 +52,7 @@ test_write <- function() {
   fs[,1] = onecol
   checkIdentical(fs[,1], onecol, "Setting BigMatrixFactor with characters")
 
+  unlink(fs.data.file)
   fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
   fs[, 1] = c("AA", "SHOE", "GOO", "AA", "BB")
   retmat = factor(c("AA", NA, NA, "AA", "BB", rep("AA", 20)), level=c("AA", "BB"))
