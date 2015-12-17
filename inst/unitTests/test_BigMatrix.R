@@ -10,6 +10,7 @@ char.mat = matrix()
 
 back.dir = tempdir()
 ds.data.file = file.path(back.dir,"bigmat","ds")
+unlink(ds.data.file)
 ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 
 test_creation <- function() {
@@ -39,6 +40,7 @@ test_coercion <- function() {
 }
 
 test_subset <- function() {
+    unlink(ds.data.file)
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   checkIdentical( ds[1,3], mat[1,3] )
   checkIdentical( ds[1,], mat[1,] )
@@ -75,6 +77,7 @@ test_write <- function() {
 }
 
 test_describing <- function() {
+    unlink(ds.data.file)
   mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   # Getting
@@ -88,10 +91,12 @@ test_describing <- function() {
   dimnames(ds) = new.dimnames
   checkIdentical(dimnames(ds), new.dimnames)
 
+    unlink(ds.data.file)
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   colnames(ds) = new.dimnames[[2]]
   checkIdentical(colnames(ds), new.dimnames[[2]])
 
+    unlink(ds.data.file)
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   rownames(ds) = new.dimnames[[1]]
   checkIdentical(rownames(ds), new.dimnames[[1]])
