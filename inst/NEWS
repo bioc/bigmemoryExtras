@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.17.0
+--------------------------
+
+    o All Biobase-related content has been removed including
+    annotatedDataFrameFrom. This means that BigMatrix objects can no longer be added to
+    eSet/ExpressionSet/GenoSet objects. Try the new SummarizedExperiment, which is the
+    eSet replacement.
+
+
 CHANGES IN VERSION 1.7.4
 --------------------------
 
