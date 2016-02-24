@@ -355,7 +355,6 @@ setMethod("apply",signature(X="BigMatrix"),
 ##' @param type character type of big.matrix (double, integer, char)
 ##' @return BigMatrix
 ##' @examples
-##' x <- big.matrix(10,  2,  type='integer',  init = -5)
 ##' dnames = dimnames=list(letters[1:3],LETTERS[1:3])
 ##' x = matrix(1:9,ncol=3,dimnames=dnames)
 ##' ds = BigMatrix(x,tempfile())
@@ -372,8 +371,6 @@ BigMatrix <- function(x=NA_real_,backingfile,nrow,ncol,dimnames=NULL,type="doubl
 ##' Version <= 1.3 type and update it to the Version >=1.4 type.
 ##' @param object BigMatrix
 ##' @export
-##' @examples
-##' x <- big.matrix(10,  2,  type='integer',  init = -4)
 ##' @return BigMatrix
 updateBigMatrix <- function(object) {
     if ("descpath" %in% ls(object)) {
@@ -402,5 +399,3 @@ updateBigMatrix <- function(object) {
     }
     return(bigmat)
 }
-
-# benchmark(x = theta$getValues(,  1),  y = theta2$getValues(,  1),  z = theta2$getValues(,  1,  withDimnames=FALSE),  replications=5)
