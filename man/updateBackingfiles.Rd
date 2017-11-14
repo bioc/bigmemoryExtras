@@ -29,4 +29,3 @@ backingfile field of the relevant BigMatrix objects.
 \dontrun{ assays(se) = updateBackingfiles(assays(se), "/new/path/to/bigmat/dir") }
 \dontrun{ assayData(eset) = updateBackingfiles(assayData(eset), "/new/path/to/bigmat/dir") }
 }
-

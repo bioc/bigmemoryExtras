@@ -33,4 +33,4 @@ biocViews: Infrastructure, DataRepresentation
 OS_type: unix
 VignetteBuilder: knitr
 URL: https://github.com/phaverty/bigmemoryExtras
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
