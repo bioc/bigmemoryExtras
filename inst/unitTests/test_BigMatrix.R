@@ -40,7 +40,7 @@ test_coercion <- function() {
 }
 
 test_subset <- function() {
-    unlink(ds.data.file)
+  unlink(ds.data.file)
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
   checkIdentical( ds[1,3], mat[1,3] )
   checkIdentical( ds[1,], mat[1,] )

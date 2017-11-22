@@ -1,6 +1,4 @@
-##########################################################
-### Functions for working with groups of BigMatrix objects
-##########################################################
+########################################################## Functions for working with groups of BigMatrix objects
 
 ##' Update directory for BigMatrix objects in a collection to new location
 ##'
@@ -16,9 +14,9 @@
 ##' @param dir character, path to directory holding all BigMatrix files
 ##' @return x param, with modified BigMatrix objects.
 ##' @examples
-##' \dontrun{ list = updateBackingfiles(list, "/new/path/to/bigmat/dir") }
-##' \dontrun{ assays(se) = updateBackingfiles(assays(se), "/new/path/to/bigmat/dir") }
-##' \dontrun{ assayData(eset) = updateBackingfiles(assayData(eset), "/new/path/to/bigmat/dir") }
+##' \dontrun{ list = updateBackingfiles(list, '/new/path/to/bigmat/dir') }
+##' \dontrun{ assays(se) = updateBackingfiles(assays(se), '/new/path/to/bigmat/dir') }
+##' \dontrun{ assayData(eset) = updateBackingfiles(assayData(eset), '/new/path/to/bigmat/dir') }
 ##' @export
 updateBackingfiles <- function(x, dir) {
     relock = FALSE
@@ -31,11 +29,15 @@ updateBackingfiles <- function(x, dir) {
         item.names = names(x)
     }
     for (item in item.names) {
-        if (is(x[[item]],"BigMatrix")) {
-            if (relock) { unlockBinding(item, x) }
-            x[[item]]$backingfile = file.path( dir, basename(x[[item]]$backingfile))
+        if (is(x[[item]], "BigMatrix")) {
+            if (relock) {
+                unlockBinding(item, x)
+            }
+            x[[item]]$backingfile = file.path(dir, basename(x[[item]]$backingfile))
         }
     }
-    if (relock) { lockEnvironment(x, bindings=TRUE) }
+    if (relock) {
+        lockEnvironment(x, bindings = TRUE)
+    }
     return(invisible(x))
 }

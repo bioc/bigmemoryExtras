@@ -1,7 +1,7 @@
-.onLoad <- function(libname,pkgname) {
-  options(bigmemory.typecast.warning=FALSE)
+.onLoad <- function(libname, pkgname) {
+    options(bigmemory.typecast.warning = FALSE)
 }
 
 .onUnLoad <- function(libpath) {
-  options(bigmemory.typecast.warning=NULL)
+    options(bigmemory.typecast.warning = NULL)
 }

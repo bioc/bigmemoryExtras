@@ -1,2 +1,2 @@
 #' keywords internal
-#' "_PACKAGE"
+#' '_PACKAGE'
