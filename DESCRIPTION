@@ -21,7 +21,7 @@ LazyLoad: yes
 ByteCompile: TRUE
 Depends:
     R (>= 2.12),
-    bigmemory (>= 4.3)
+    bigmemory (>= 4.5.31)
 Imports:
     methods
 Suggests:

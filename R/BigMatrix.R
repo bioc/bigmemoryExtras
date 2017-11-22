@@ -335,7 +335,7 @@ setMethod("apply", signature(X = "BigMatrix"), function(X, MARGIN, FUN, ...) {
     }
     unlink(file.path(backingpath, descriptorfile))  # Delete bigmemory version of desc file until they stop using dput/dget
     description = describe(new.matrix)@description  # description method is not exported and it just does this anyway
-    bm = getRefClass(class)$new(.bm = new.matrix, .description = description, .backingfile = backingfile,
+    bm = getRefClass(class)$new(.bm = new.matrix, .description = description,
                                 .rownames = dimnames[[1]], .colnames = dimnames[[2]], ...)
     return(bm)
 }
@@ -364,20 +364,19 @@ BigMatrix <- function(x = NA_real_, backingfile, nrow, ncol, dimnames = NULL, ty
 ##' Update previous BigMatrix type to new BigMatrix
 ##'
 ##' BigMatrix has changed some of its internal storage to eliminate the descriptor file and to keep the dimnames on the R side. This function will take a
-##' Version <= 1.3 type and update it to the Version >=1.4 type.
+##' Version <= 1.3 type and update it to the Version >= 1.4 type.
 ##' @param object BigMatrix
 ##' @export
 ##' @return BigMatrix
 updateBigMatrix <- function(object) {
+    browser()
     if ("descpath" %in% ls(object)) {
         path = object$descpath
         tryCatch({
             desc = readRDS(path)
         }, error = function(e) {
-            stop(sprintf("Failed to read descriptor file when updating BigMatrix.\n%s\n",
-                         e))
+            stop(sprintf("Failed to read descriptor file when updating BigMatrix.\n%s\n", e))
         })
-
         desc.list = desc@description
         dimnames = list(desc.list$rowNames, desc.list$colNames)
         desc.list$rowNames = desc.list$colNames = NULL
