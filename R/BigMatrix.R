@@ -75,9 +75,6 @@ BigMatrixGenerator <- setRefClass("BigMatrix",
                                    .self$.description = value
                                }
                            },
-                           datafile = function(value) {
-                             .Defunct(new=backingfile, msg="The datafile is now called 'backingfile' like in bigmemory proper.")
-                           }),
                          methods=list(
                            rownames = function(value) {
                              if (missing(value)) {
@@ -396,4 +393,3 @@ updateBigMatrix <- function(object) {
     }
     return(bigmat)
 }
-
