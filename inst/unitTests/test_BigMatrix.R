@@ -115,6 +115,18 @@ test_reattach <- function() {
 }
 
 test_paths <- function() {
+  rownames = letters[1:3]
+  colnames = LETTERS[1:3]
+  mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
+  int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
+  levels = c("AA","BB")
+  char.mat = matrix()
+
+  back.dir = tempdir()
+  ds.data.file = file.path(back.dir,"bigmat","ds")
+  unlink(ds.data.file)
+  ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
+
   checkEquals(normalizePath(ds$backingfile),normalizePath(ds.data.file))
   new.data.file = tempfile()
   new.ds = BigMatrix(mat,new.data.file,3,3,list(rownames,colnames))
@@ -130,16 +142,4 @@ test_paths <- function() {
   desc$filename = basename(new.data.file)
   new.ds$description = desc
   checkEquals(basename(new.ds$backingfile), new.ds$.description$filename, "filename in backingfile gets set by description")
-}
-
-test_update <- function() {
-  object.file = system.file("unitTests/tdata/old.ds.rda", package="bigmemoryExtras")
-  desc.file = system.file("unitTests/tdata/ds.desc.rds", package="bigmemoryExtras")
-  ds = get(load(object.file))
-  ds@.xData$descpath = desc.file
-  checkException(ds[1, 1], "Should fail to attach an old-style object.", silent=TRUE)
-  newds = updateBigMatrix(ds)
-  checkTrue(validObject(newds))
-  checkIdentical(rownames, rownames(newds))
-  checkIdentical(colnames, colnames(newds))
 }
