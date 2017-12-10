@@ -1,5 +1,5 @@
 library(bigmemoryExtras)
-library(RUnit)
+library(testthat)
 
 rownames = letters[1:3]
 colnames = LETTERS[1:3]
@@ -14,43 +14,43 @@ int.mat = matrix(c(rep(1L,5),rep(2L,4)),ncol=3,dimnames=list(rownames,colnames))
 levels = c("AA","BB")
 fs = BigMatrixFactor(char.mat, backingfile=fs.data.file,nrow=3,ncol=3,dimnames=list(rownames,colnames),levels=levels)
 
-test_creation <- function() {
+test_that("We can create BigMatrix objects", {
   back.dir = tempdir()
 
   fs = BigMatrixFactor(char.mat, backingfile=tempfile(), levels=levels)
-  checkTrue(validObject(fs))
-  checkEquals(fs[, ], factor.mat, "Initialize with char mat, gets right chars")
+  expect_true(validObject(fs))
+  expect_equal(fs[, ], factor.mat)
 
   na_bmf = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL, levels=LETTERS[1:3])
-  checkTrue( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
-  checkTrue( all(BigMatrixFactor("B", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ] == "B"), "Scalar character init value in levels is OK.")
-  checkTrue( all(is.na( BigMatrixFactor("X", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
-  checkTrue( all(is.na( BigMatrixFactor(1, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
-  checkTrue( all(is.na( BigMatrixFactor(matrix(1:9,ncol=3), backingfile=tempfile(), levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
+  expect_true( all(is.na(na_bmf[, ])), "Default init is to all NA for BigMatrixFactor")
+  expect_true( all(BigMatrixFactor("B", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ] == "B"), "Scalar character init value in levels is OK.")
+  expect_true( all(is.na( BigMatrixFactor("X", backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
+  expect_true( all(is.na( BigMatrixFactor(1, backingfile=tempfile(), ncol=3, nrow=4, levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
+  expect_true( all(is.na( BigMatrixFactor(matrix(1:9,ncol=3), backingfile=tempfile(), levels=LETTERS[1:4])[, ])), "Bad scalar init value becomes NA")
   bad.char.mat = matrix( c('a', 3, 'b', 'e'), ncol=2)
   expected.bad.char.mat = matrix( c('a', 3, 'b', NA), ncol=2)
-  checkIdentical( as.character(expected.bad.char.mat), as.character(BigMatrixFactor(bad.char.mat, backingfile=tempfile(), levels=c('a', '3', 'b', 'c'))[, ]), "Bad values in init mat become NA")
-  checkIdentical( c("AA", "BB"), levels(BigMatrixFactor(char.mat, backingfile=tempfile())), "Levels set from character if missing")
-}
+  expect_identical( as.character(expected.bad.char.mat), as.character(BigMatrixFactor(bad.char.mat, backingfile=tempfile(), levels=c('a', '3', 'b', 'c'))[, ]), "Bad values in init mat become NA")
+  expect_identical( c("AA", "BB"), levels(BigMatrixFactor(char.mat, backingfile=tempfile())), "Levels set from character if missing")
+})
 
-test_coercion <- function() {
-  checkEquals( fs[,], as.matrix(fs) )
-}
+test_that("We can coerce between types", {
+  expect_identical( fs[,], as.matrix(fs) )
+})
 
-test_subset <- function() {
+test_that("We can subset", {
   char.mat = matrix(c(rep("AA",5),rep("BB",4)),ncol=3,dimnames=list(rownames,colnames))
   fac1 = factor(char.mat[, 1], levels=c("AA", "BB"))
   fac2 = factor(char.mat[2, ], levels=c("AA", "BB"))
-  checkIdentical( fs[,], factor.mat )
-  checkIdentical( fs[,1], fac1 )
-  checkIdentical( fs[2,], fac2 )
-}
+  expect_identical( fs[,], factor.mat )
+  expect_identical( fs[,1], fac1 )
+  expect_identical( fs[2,], fac2 )
+})
 
-test_write <- function() {
+test_that("We can write to objects", {
   onecol = factor(c(2,NA,1), levels=c("AA", "BB"))
   names(onecol) = rownames
   fs[,1] = onecol
-  checkIdentical(fs[,1], onecol, "Setting BigMatrixFactor with characters")
+  expect_identical(fs[,1], onecol, "Setting BigMatrixFactor with characters")
 
   unlink(fs.data.file)
   fs = BigMatrixFactor("AA",fs.data.file,5,5,levels=levels)
@@ -60,7 +60,7 @@ test_write <- function() {
   attributes(retmat) = attributes(retmat)[c("dim", "class", "levels")]
   attr(retmat, "class") = c("matrix", "factor")
   fs_return = fs[,]; dimnames(fs_return) = NULL  # Hack for bad handling of dimnames when they are NULL by bigmemory < 4.4.4
-  checkIdentical( fs_return, retmat, "Setting BMF with bad characters gives NAs")
+  expect_identical( fs_return, retmat, "Setting BMF with bad characters gives NAs")
 
   fs2 = BigMatrixFactor(backingfile=tempfile(), nrow=3, ncol=3, levels=c('A', '9', 'B', '12'))
   fs2[, ] = "A"
@@ -71,16 +71,13 @@ test_write <- function() {
   attributes(retmat2) = attributes(retmat2)[c("dim", "class", "levels")]
   attr(retmat2, "class") = c("matrix", "factor")
   fs2_return = fs2[,]; dimnames(fs2_return) = NULL  # Hack for bad handling of dimnames when they are NULL by bigmemory < 4.4.4
-  checkIdentical( retmat2, fs2_return)
-}
+  expect_identical( retmat2, fs2_return)
+})
 
-test_levels <- function() {
-  checkIdentical( levels(fs), c("AA","BB") )
-  checkIdentical( fs$levels, c("AA","BB") )
-  checkException( fs$levels <- c("AB","QQ"), silent=TRUE )
-  checkException( levels(fs) <- c("AB","QQ"), silent=TRUE )
-}
-
-test_nlevels <- function() {
-  checkEquals( nlevels(fs), 2L )
-}
+test_that("levels work", {
+  expect_identical( levels(fs), c("AA","BB") )
+  expect_identical( fs$levels, c("AA","BB") )
+  expect_error( fs$levels <- c("AB","QQ"), silent=TRUE )
+  expect_error( levels(fs) <- c("AB","QQ"), silent=TRUE )
+  expect_equal( nlevels(fs), 2L )
+})

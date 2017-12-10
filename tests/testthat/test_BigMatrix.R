@@ -1,5 +1,5 @@
 library(bigmemoryExtras)
-library(RUnit)
+library(testthat)
 
 rownames = letters[1:3]
 colnames = LETTERS[1:3]
@@ -13,108 +13,108 @@ ds.data.file = file.path(back.dir,"bigmat","ds")
 unlink(ds.data.file)
 ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 
-test_creation <- function() {
+test_that("We can create BigMatrix objects", {
   back.dir = tempdir()
   back.file = tempfile()
   ds = BigMatrix(mat,back.file)
-  checkTrue(validObject(ds))
-  checkEquals(ds[,],mat)
+  expect_true(validObject(ds))
+  expect_equal(ds[,],mat)
 
   ds = BigMatrix(ds$bigmat,back.file, dimnames=dimnames(mat))
-  checkTrue(validObject(ds))
-  checkEquals(ds[,],mat)
+  expect_true(validObject(ds))
+  expect_equal(ds[,],mat)
 
   ds = BigMatrix(x=NULL,tempfile(),3,3,list(rownames,colnames))
   ds[,] = mat
-  checkTrue(validObject( ds ))
-  checkEquals(ds[,],mat)
-  checkException( BigMatrix(x=1:4, tempfile()), "x must be NULL, scalar numeric, matrix, or bigmatrix.", silent=TRUE)
-  checkEquals( BigMatrix(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12, "BigMatrix creation with a scalar init value.")
+  expect_true(validObject( ds ))
+  expect_equal(ds[,],mat)
+  expect_error( BigMatrix(x=1:4, tempfile()) )
+  expect_equal( BigMatrix(x=12, ncol=2, nrow=2, dimnames=list(LETTERS[1:2], LETTERS[1:2]), tempfile())[2, 2], 12)
   na_bm = BigMatrix(backingfile=tempfile(), nrow=3, ncol=3, dimnames=NULL)
-  checkTrue( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
-}
+  expect_true( all(is.na(na_bm[, ])), "Default init is to all NA for BigMatrix")
+})
 
-test_coercion <- function() {
-  checkEquals( ds[,], as(ds,"matrix") )
-  checkEquals( ds[,], as.matrix(ds) )
-}
+test_that("We can coerce between types", {
+  expect_equal( ds[,], as(ds,"matrix") )
+  expect_equal( ds[,], as.matrix(ds) )
+})
 
-test_subset <- function() {
+test_that("We can subset", {
   unlink(ds.data.file)
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
-  checkIdentical( ds[1,3], mat[1,3] )
-  checkIdentical( ds[1,], mat[1,] )
-  checkIdentical( ds[,2], mat[,2] )
-  checkIdentical( ds[,], mat )
-  checkIdentical( ds["a",], mat["a",] )
-  checkIdentical( ds[,"B"], mat[,"B"] )
+  expect_identical( ds[1,3], mat[1,3] )
+  expect_identical( ds[1,], mat[1,] )
+  expect_identical( ds[,2], mat[,2] )
+  expect_identical( ds[,], mat )
+  expect_identical( ds["a",], mat["a",] )
+  expect_identical( ds[,"B"], mat[,"B"] )
   ds["b","B"] = 3
   mat["b","B"] = 3
-  checkIdentical( ds[,], mat,"After re-setting some values" )
+  expect_identical( ds[,], mat,"After re-setting some values" )
   mat_nonames = mat
   dimnames(mat_nonames) = NULL
   ds_nonames = BigMatrix(mat_nonames,tempfile(),3,3)
   ds_nonames_return = ds_nonames[,];   dimnames(ds_nonames_return) = NULL  # Hack for bad handling of dimnames when they are NULL by bigmemory < 4.4.4
-  checkIdentical( ds_nonames_return, mat_nonames, "Get full matrix from BM w/o dimnames" )
-}
+  expect_identical( ds_nonames_return, mat_nonames, "Get full matrix from BM w/o dimnames" )
+})
 
-test_write <- function() {
+test_that("We can write to objects", {
   ds[1,1] = 5
-  checkIdentical(ds[1,1],5,"Writing to a BigMatrix")
+  expect_identical(ds[1,1],5,"Writing to a BigMatrix")
   ds[2,] = 5
-  checkIdentical(ds[2,],c(A=5,B=5,C=5),"Writing row to a BigMatrix")
+  expect_identical(ds[2,],c(A=5,B=5,C=5),"Writing row to a BigMatrix")
   ds[,2] = 7
-  checkIdentical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix")
+  expect_identical(ds[,2],c(a=7,b=7,c=7),"Writing col to a BigMatrix")
   ds[,] = mat
-  checkIdentical(ds[,],mat,"Writing whole matrix to a BigMatrix")
+  expect_identical(ds[,],mat,"Writing whole matrix to a BigMatrix")
   Sys.chmod(ds$backingfile,"0444")
   ds$attach(force=TRUE)
-  checkException( ds[1,1] <- 5, silent=TRUE, "Writing to a BigMatrix with a non-writeable data file")
+  expect_error( ds[1,1] <- 5 )
   Sys.chmod(ds$backingfile,"0644")
   ds$attach(force=TRUE)
-  checkIdentical(ds[1, 1], 1, "OK read after chmod to readable and attach.")
+  expect_identical(ds[1, 1], 1, "OK read after chmod to readable and attach.")
   return(TRUE)
-}
+})
 
-test_describing <- function() {
+test_that("We can describe objects", {
     unlink(ds.data.file)
     mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
     ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
                                         # Getting
-    checkEquals(nrow(ds),nrow(mat))
-    checkEquals(ncol(ds),ncol(mat))
-    checkEquals(dim(ds),dim(mat))
-    checkEquals(length(ds),length(mat))
-    checkIdentical(dimnames(ds),dimnames(mat))
+    expect_equal(nrow(ds),nrow(mat))
+    expect_equal(ncol(ds),ncol(mat))
+    expect_equal(dim(ds),dim(mat))
+    expect_equal(length(ds),length(mat))
+    expect_identical(dimnames(ds),dimnames(mat))
                                         # Setting
     new.dimnames = list(letters[4:6], LETTERS[4:6])
     dimnames(ds) = new.dimnames
-    checkIdentical(dimnames(ds), new.dimnames)
+    expect_identical(dimnames(ds), new.dimnames)
 
     unlink(ds.data.file)
     ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
     colnames(ds) = new.dimnames[[2]]
-    checkIdentical(colnames(ds), new.dimnames[[2]])
+    expect_identical(colnames(ds), new.dimnames[[2]])
 
     unlink(ds.data.file)
     ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
     rownames(ds) = new.dimnames[[1]]
-    checkIdentical(rownames(ds), new.dimnames[[1]])
-}
+    expect_identical(rownames(ds), new.dimnames[[1]])
+})
 
-test_reattach <- function() {
+test_that("We can reattach saved objects", {
   mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
   data.file = tempfile()
   old.ds = BigMatrix(mat,data.file,3,3,list(rownames,colnames))
   object.file = paste(data.file,".rds",sep="")
   saveRDS(old.ds,file=object.file)
   new.ds = readRDS(object.file)
-  checkEquals( new.ds[,], mat )
+  expect_equal( new.ds[,], mat )
   file.rename(old.ds$backingfile,file.path(tempdir(),"shoe2"))
-  checkException(old.ds$attach(force=TRUE),silent=TRUE,"Missing descriptor file")
-}
+  expect_error(old.ds$attach(force=TRUE))
+})
 
-test_paths <- function() {
+test_that("We can get and set the data paths", {
   rownames = letters[1:3]
   colnames = LETTERS[1:3]
   mat = matrix(as.numeric(1:9),ncol=3,dimnames=list(rownames,colnames))
@@ -127,19 +127,19 @@ test_paths <- function() {
   unlink(ds.data.file)
   ds = BigMatrix(mat,ds.data.file,3,3,list(rownames,colnames))
 
-  checkEquals(normalizePath(ds$backingfile),normalizePath(ds.data.file))
+  expect_equal(normalizePath(ds$backingfile),normalizePath(ds.data.file))
   new.data.file = tempfile()
   new.ds = BigMatrix(mat,new.data.file,3,3,list(rownames,colnames))
   even.newer.data.file = tempfile()
-  checkException({new.ds$backingfile = even.newer.data.file},silent=TRUE,"backingfile must exist before datapath is replaced.")
+  expect_error({new.ds$backingfile = even.newer.data.file})
   file.copy(ds.data.file,even.newer.data.file)
   new.ds$backingfile = even.newer.data.file
   even.newer.data.file = normalizePath(even.newer.data.file)
-  checkEquals(normalizePath(new.ds$backingfile),even.newer.data.file)
-  checkEquals(new.ds[,], ds[,])
-  checkEquals(basename(new.ds$backingfile), new.ds$.description$filename, "filename in description gets set by backingfile")
+  expect_equal(normalizePath(new.ds$backingfile),even.newer.data.file)
+  expect_equal(new.ds[,], ds[,])
+  expect_equal(basename(new.ds$backingfile), new.ds$.description$filename, "filename in description gets set by backingfile")
   desc = new.ds$description
   desc$filename = basename(new.data.file)
   new.ds$description = desc
-  checkEquals(basename(new.ds$backingfile), new.ds$.description$filename, "filename in backingfile gets set by description")
-}
+  expect_equal(basename(new.ds$backingfile), new.ds$.description$filename, "filename in backingfile gets set by description")
+})
