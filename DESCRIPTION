@@ -25,7 +25,7 @@ Depends:
 Imports:
     methods
 Suggests:
-    RUnit,
+    testthat,
     BiocGenerics,
     BiocStyle,
     knitr
