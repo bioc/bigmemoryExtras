@@ -117,7 +117,7 @@ BigMatrixGenerator <- setRefClass("BigMatrix", fields = list(.rownames = "charac
                                       if (force == FALSE && !is.nil(.self$.bm@address)) {
                                           message("Already attached to on-disk data. To re-attach, use force=TRUE.\n")
                                       } else {
-                                          message("Attaching to on-disk data:", .self$backingfile, "...\n")
+                                          message("Attaching to on-disk data: ", .self$backingfile, "...\n")
                                           if (!file.exists(backingfile)) {
                                               stop("Backing file ", backingfile, " does not exist.")
                                           }
@@ -369,7 +369,6 @@ BigMatrix <- function(x = NA_real_, backingfile, nrow, ncol, dimnames = NULL, ty
 ##' @export
 ##' @return BigMatrix
 updateBigMatrix <- function(object) {
-    browser()
     if ("descpath" %in% ls(object)) {
         path = object$descpath
         tryCatch({

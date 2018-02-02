@@ -1,6 +1,6 @@
 ############################## Class BigMatrixFactor ###
 ##' @exportClass BigMatrixFactor
-BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor", contains = "BigMatrix", 
+BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor", contains = "BigMatrix",
     fields = list(levels = function(value) {
         if (missing(value)) {
             return(.self$.levels)
@@ -47,7 +47,7 @@ BigMatrixFactorGenerator <- setRefClass("BigMatrixFactor", contains = "BigMatrix
 ##' ds = BigMatrixFactor(x,tempfile(),levels=levels)
 ##' ds = BigMatrixFactor(backingfile=tempfile(),nrow=3,ncol=3,dimnames=dnames,levels=levels)
 ##' @export
-BigMatrixFactor <- function(x = NA_character_, backingfile, nrow, ncol, dimnames = NULL, 
+BigMatrixFactor <- function(x = NA_character_, backingfile, nrow, ncol, dimnames = NULL,
     levels) {
     if (!(is.matrix(x) || length(x) == 1)) {
         stop("Initial value for BigMatrixFactor must be a matrix or of length 1.")
@@ -66,7 +66,7 @@ BigMatrixFactor <- function(x = NA_character_, backingfile, nrow, ncol, dimnames
     }
     x = match(x, levels)
     attributes(x) = att.list
-    bm = .initBigMatrix(x = x, class = "BigMatrixFactor", backingfile = backingfile, 
+    bm = .initBigMatrix(x = x, class = "BigMatrixFactor", backingfile = backingfile,
         nrow = nrow, ncol = ncol, dimnames = dimnames, .levels = levels, type = type)
     return(bm)
 }
